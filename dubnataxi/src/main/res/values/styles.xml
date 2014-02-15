@@ -1,8 +1,5 @@
+<!-- Base application theme. -->
 <resources>
-
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
-    </style>
-
+    <style name="Theme.MyTheme" parent="@style/Theme.Base.AppCompat.Light.DarkActionBar"/>
 </resources>
+

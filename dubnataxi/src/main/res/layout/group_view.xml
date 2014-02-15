@@ -3,9 +3,7 @@
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
-                 android:background="@color/parent_item"
                  android:gravity="center_vertical"
-                 android:textColor="#FFFFFF"
                  android:paddingLeft="@dimen/list_parent_left_padding"
                  android:textSize="@dimen/list_text_size"
                  android:textStyle="bold" />
