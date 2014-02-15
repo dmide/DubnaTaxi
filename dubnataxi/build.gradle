@@ -1,15 +1,8 @@
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:0.6.+'
-    }
-}
 apply plugin: 'android'
 
-repositories {
-    mavenCentral()
+dependencies {
+    compile 'com.android.support:appcompat-v7:19.0.+'
+    compile files('libs/quick-json-1.0.2.3.jar')
 }
 
 android {
@@ -20,13 +13,5 @@ android {
         minSdkVersion 7
         targetSdkVersion 19
     }
-
-    dependencies {
-        compile files('libs/quick-json-1.0.2.3.jar')
-    }
 }
 
-dependencies {
-	compile 'com.android.support:appcompat-v7:19.0.1'
-    compile files('libs/quick-json-1.0.2.3.jar')
-}
