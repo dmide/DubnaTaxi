@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="parent_item">#ff005bc1</color>
-    <color name="child_item">#177bbd</color>
+    <color name="border">#ffbcb8bd</color>
+    <color name="bg_default">#ffd1cdd2</color>
+    <color name="bg_item">#ffe9e5ea</color>
 </resources>

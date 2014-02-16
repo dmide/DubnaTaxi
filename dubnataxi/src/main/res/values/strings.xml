@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Dubnataxi</string>
+    <string name="app_name">DubnaTaxi</string>
     <string name="action_settings">Settings</string>
-    <string name="action_update">Update</string>
     <string name="problem">Не удается получить данные, проблемы с соединением. Попробуйте повторить действие.</string>
+    <string name="cancel">Отмена</string>
 
 </resources>

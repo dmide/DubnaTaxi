@@ -4,13 +4,17 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.widget.Adapter;
-import android.widget.ArrayAdapter;
 import android.widget.Toast;
+
 import com.json.parsers.JSONParser;
 
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
 
 /**
  * Created by dmide on 19/01/14.
@@ -18,25 +22,29 @@ import java.util.*;
 public class ContentLoadTask extends AsyncTask<Void, Void, Void> {
     private static final String CONTENT_URL = "http://dubnataxi.esy.es/";
     private static final String CONTENT = "content";
-
-
-    private Exception e;
-    private MainActivity activity;
+    private final boolean useCache;
     private final LinkedHashMap<String, ArrayList<String>> taxiNumbersTree = new LinkedHashMap<String, ArrayList<String>>();
     private final StringBuilder page = new StringBuilder();
     private final SharedPreferences preferences;
+    private Exception e;
+    private MainActivity activity;
+    private PullToRefreshLayout pullToRefreshLayout;
 
-    public ContentLoadTask(MainActivity activity) {
+    public ContentLoadTask(MainActivity activity, PullToRefreshLayout pullToRefreshLayout, boolean useCache) {
         this.activity = activity;
+        this.pullToRefreshLayout = pullToRefreshLayout;
+        this.useCache = useCache;
         preferences = PreferenceManager.getDefaultSharedPreferences(activity);
     }
 
     @Override
     protected Void doInBackground(Void... params) {
-        String pageStr = preferences.getString(CONTENT,"");
-        if (pageStr.length() != 0){
-            page.append(pageStr);
-            return (null);
+        if (useCache) {
+            String pageStr = preferences.getString(CONTENT, "");
+            if (pageStr.length() != 0) {
+                page.append(pageStr);
+                return (null);
+            }
         }
         try {
             WebHelper.loadContent(new URL(CONTENT_URL), new NumbersParser(), "");
@@ -64,11 +72,12 @@ public class ContentLoadTask extends AsyncTask<Void, Void, Void> {
                 numbers = (ArrayList) service.get("numbers");
                 taxiNumbersTree.put(name, numbers);
             }
-            activity.drawContent(taxiNumbersTree);
+            activity.processContent(taxiNumbersTree);
         } else {
             Toast.makeText(activity, activity.getString(R.string.problem),
                     Toast.LENGTH_LONG).show();
         }
+        pullToRefreshLayout.setRefreshComplete();
     }
 
     private class NumbersParser implements WebHelper.Parser {
