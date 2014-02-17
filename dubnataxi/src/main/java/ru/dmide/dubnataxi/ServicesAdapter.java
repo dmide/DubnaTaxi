@@ -12,7 +12,7 @@ import java.util.ArrayList;
 public class ServicesAdapter extends ArrayAdapter {
 
     private final LayoutInflater inflater;
-    private ArrayList<String> serviceNames;
+    private ArrayList<String> services;
     private final int listItemHeight;
 
     public ServicesAdapter(MainActivity activity) {
@@ -21,7 +21,7 @@ public class ServicesAdapter extends ArrayAdapter {
     }
 
     public void init(ArrayList<String> services) {
-        serviceNames = services;
+        this.services = services;
         notifyDataSetChanged();
     }
 
@@ -31,14 +31,14 @@ public class ServicesAdapter extends ArrayAdapter {
             convertView = inflater.inflate(R.layout.group_view, null);
         }
         TextView textView = (TextView) convertView.findViewById(R.id.text);
-        textView.setText(serviceNames.get(position));
+        textView.setText(services.get(position));
         textView.setHeight(listItemHeight);
         return convertView;
     }
 
     @Override
     public int getCount() {
-        return serviceNames.size();
+        return services.size();
     }
 
     @Override

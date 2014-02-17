@@ -55,6 +55,11 @@ public class PhonesAdapter extends ArrayAdapter {
     }
 
     @Override
+    public Object getItem(int position) {
+        return phones.get(position);
+    }
+
+    @Override
     public boolean hasStableIds() {
         return false;
     }

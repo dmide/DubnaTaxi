@@ -35,19 +35,24 @@ import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 public class MainActivity extends ActionBarActivity {
 
     private static final String CALLED_NUMS = "CALLED_NUMS";
+    private static final String DELETED_NUMS = "DELETED_NUMS";
+    private static final String DELETED_SERVICES = "DELETED_SERVICES";
     private final ArrayList<ArrayList<String>> numberLists = new ArrayList<ArrayList<String>>();
-    private ListView servicesList;
+    private ArrayList<String> servicesList = new ArrayList<String>();
+    private ListView servicesListView;
     private ServicesAdapter servicesAdapter;
     private PhonesAdapter phonesAdapter;
     private PullToRefreshLayout pullToRefreshLayout;
     private Set<String> calledNumbers = new HashSet<String>();
+    private Set<String> deletedNumbers = new HashSet<String>();
+    private Set<String> deletedServices = new HashSet<String>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        servicesList = (ListView) findViewById(R.id.list);
-        servicesList.setDivider(null);
+        servicesListView = (ListView) findViewById(R.id.list);
+        servicesListView.setDivider(null);
         servicesAdapter = new ServicesAdapter(this);
         phonesAdapter = new PhonesAdapter(this);
 
@@ -62,7 +67,7 @@ public class MainActivity extends ActionBarActivity {
                 })
                 .setup(pullToRefreshLayout);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            new GetCalledNumbersTask().execute();
+            loadSavedActions();
         }
         updateContent(true);
     }
@@ -95,28 +100,44 @@ public class MainActivity extends ActionBarActivity {
         for (ArrayList<String> numbers : taxiNumbersTree.values()) {
             numberLists.add(numbers);
         }
-        servicesAdapter.init(new ArrayList<String>(taxiNumbersTree.keySet()));
+        servicesList = new ArrayList<String>(taxiNumbersTree.keySet());
+        servicesList.removeAll(deletedServices);
+        servicesAdapter.init(servicesList);
         AnimationAdapter animAdapter = new ScaleInAnimationAdapter(servicesAdapter);
-
-        animAdapter.setAbsListView(servicesList);
-        servicesList.setAdapter(animAdapter);
-        servicesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        animAdapter.setAbsListView(servicesListView);
+        servicesListView.setAdapter(animAdapter);
+        servicesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                phonesAdapter.init(numberLists.get(position));
+            public void onItemClick(AdapterView<?> parent, View view, final int groupPos, long id) {
+                ArrayList<String> phones = numberLists.get(groupPos);
+                phones.removeAll(deletedNumbers);
+                phonesAdapter.init(phones);
                 ListView phonesList = new ListView(MainActivity.this);
+                final AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).
+                        setView(phonesList).
+                        create();
                 SwipeDismissAdapter dismissAdapter = new SwipeDismissAdapter(phonesAdapter, new OnDismissCallback() {
                     @Override
                     public void onDismiss(AbsListView absListView, int[] ints) {
-
+                        String deletedPhone = (String) absListView.getItemAtPosition(ints[0]);
+                        deletedNumbers.add(deletedPhone);
+                        new SaveDeletedNumbersTask().execute();
+                        ArrayList<String> phones = numberLists.get(groupPos);
+                        phones.removeAll(deletedNumbers);
+                        if (phones.isEmpty()) {
+                            deletedServices.add(servicesList.get(groupPos));
+                            new SaveDeletedServicesTask().execute();
+                            servicesList.removeAll(deletedServices);
+                            servicesAdapter.init(servicesList);
+                            dialog.dismiss();
+                        } else {
+                            phonesAdapter.init(phones);
+                        }
                     }
                 });
                 dismissAdapter.setAbsListView(phonesList);
                 phonesList.setAdapter(dismissAdapter);
                 setChildsListener(phonesList);
-                AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).
-                        setView(phonesList).
-                        create();
                 dialog.show();
             }
         });
@@ -136,10 +157,9 @@ public class MainActivity extends ActionBarActivity {
                 callIntent.setData(Uri.parse("tel:" + number));
                 calledNumbers.add(number);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                    new SaveCalledNumbersTask(callIntent).execute();
-                } else {
-                    startActivity(callIntent);
+                    new SaveCalledNumbersTask().execute();
                 }
+                startActivity(callIntent);
                 servicesAdapter.notifyDataSetChanged();
             }
         });
@@ -147,11 +167,26 @@ public class MainActivity extends ActionBarActivity {
 
     private void updateContent(boolean useCache) {
         new ContentLoadTask(this, pullToRefreshLayout, useCache).execute();
+        if (!useCache){
+            clearDeletedValues();
+        }
+    }
+
+    private void loadSavedActions() {
+        new GetCalledNumbersTask().execute();
+        new GetDeletedNumbersTask().execute();
+        new GetDeletedServicesTask().execute();
+    }
+
+    private void clearDeletedValues() {
+        deletedNumbers.clear();
+        deletedServices.clear();
+        new SaveDeletedNumbersTask().execute();
+        new SaveDeletedServicesTask().execute();
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private class GetCalledNumbersTask extends AsyncTask<Void, Void, Void> {
-
         @Override
         protected Void doInBackground(Void... params) {
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
@@ -163,22 +198,53 @@ public class MainActivity extends ActionBarActivity {
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private class SaveCalledNumbersTask extends AsyncTask<Void, Void, Void> {
-        private Intent intent;
-
-        SaveCalledNumbersTask(Intent intent) {
-            this.intent = intent;
-        }
-
         @Override
         protected Void doInBackground(Void... params) {
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
             preferences.edit().putStringSet(CALLED_NUMS, calledNumbers).commit();
             return null;
         }
+    }
 
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    private class GetDeletedNumbersTask extends AsyncTask<Void, Void, Void> {
         @Override
-        protected void onPostExecute(Void aVoid) {
-            MainActivity.this.startActivity(intent);
+        protected Void doInBackground(Void... params) {
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+            //creating a copy of Set due to a bug in API: http://stackoverflow.com/a/17470210/2093236
+            deletedNumbers = new HashSet<String>(preferences.getStringSet(DELETED_NUMS, new HashSet<String>()));
+            return null;
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    private class SaveDeletedNumbersTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... params) {
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+            preferences.edit().putStringSet(DELETED_NUMS, deletedNumbers).commit();
+            return null;
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    private class GetDeletedServicesTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... params) {
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+            //creating a copy of Set due to a bug in API: http://stackoverflow.com/a/17470210/2093236
+            deletedServices = new HashSet<String>(preferences.getStringSet(DELETED_SERVICES, new HashSet<String>()));
+            return null;
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    private class SaveDeletedServicesTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... params) {
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+            preferences.edit().putStringSet(DELETED_SERVICES, deletedServices).commit();
+            return null;
         }
     }
 }
