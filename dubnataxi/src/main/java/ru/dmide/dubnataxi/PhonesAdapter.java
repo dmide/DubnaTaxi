@@ -19,7 +19,7 @@ public class PhonesAdapter extends ArrayAdapter {
     private final LayoutInflater inflater;
     private final int listItemHeight;
     private ArrayList<String> phones;
-    private Set<Integer> calledNumbers = new HashSet<>();
+    private Set<Integer> calledNumbers = new HashSet<Integer>();
 
     public PhonesAdapter(MainActivity activity) {
         inflater = activity.getLayoutInflater();

@@ -37,12 +37,12 @@ import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 public class MainActivity extends ActionBarActivity {
 
     private static final String CALLED_NUMS = "CALLED_NUMS";
-    private final ArrayList<ArrayList<String>> numberLists = new ArrayList<>();
+    private final ArrayList<ArrayList<String>> numberLists = new ArrayList<ArrayList<String>>();
     private ListView servicesList;
     private ServicesAdapter servicesAdapter;
     private PhonesAdapter phonesAdapter;
     private PullToRefreshLayout pullToRefreshLayout;
-    private Set<String> calledNumbers = new HashSet<>();
+    private Set<String> calledNumbers = new HashSet<String>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,7 +97,7 @@ public class MainActivity extends ActionBarActivity {
         for (ArrayList<String> numbers : taxiNumbersTree.values()) {
             numberLists.add(numbers);
         }
-        servicesAdapter.init(new ArrayList<>(taxiNumbersTree.keySet()));
+        servicesAdapter.init(new ArrayList<String>(taxiNumbersTree.keySet()));
         AnimationAdapter animAdapter = new ScaleInAnimationAdapter(servicesAdapter);
 
         animAdapter.setAbsListView(servicesList);
