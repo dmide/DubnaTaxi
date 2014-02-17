@@ -19,9 +19,10 @@ public class PhonesAdapter extends ArrayAdapter {
     private final LayoutInflater inflater;
     private final int listItemHeight;
     private ArrayList<String> phones;
-    private Set<Integer> calledNumbers = new HashSet<Integer>();
+    private MainActivity activity;
 
     public PhonesAdapter(MainActivity activity) {
+        this.activity = activity;
         inflater = activity.getLayoutInflater();
         listItemHeight = (int) activity.getResources().getDimension(R.dimen.list_item_height);
     }
@@ -31,18 +32,20 @@ public class PhonesAdapter extends ArrayAdapter {
         notifyDataSetChanged();
     }
 
-    public void setSelected(int position){
-        calledNumbers.add(position);
-    }
-
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
             convertView = inflater.inflate(R.layout.child_view, null);
         }
         TextView textView = (TextView) convertView.findViewById(R.id.phone_number_tv);
-        textView.setText(phones.get(position));
         textView.setHeight(listItemHeight);
+        String phone = phones.get(position);
+        textView.setText(phone);
+        if (activity.getCalledNumbers().contains(phone)){
+            convertView.findViewById(R.id.called).setVisibility(View.VISIBLE);
+        } else {
+            convertView.findViewById(R.id.called).setVisibility(View.INVISIBLE);
+        }
         return convertView;
     }
 

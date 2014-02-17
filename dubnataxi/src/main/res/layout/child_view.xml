@@ -6,15 +6,27 @@
     android:layout_height="wrap_content"
     android:background="@drawable/selector">
 
+    <ImageView
+        android:id="@+id/called"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_gravity="center_vertical"
+        android:paddingRight="@dimen/drawable_padding"
+        android:paddingTop="@dimen/drawable_padding"
+        android:paddingLeft="@dimen/drawable_padding"
+        android:layout_marginTop="@dimen/called_drawable_paddingtop"
+        android:src="@drawable/ic_called"
+        android:visibility="invisible"/>
+
     <TextView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/phone_number_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:paddingLeft="@dimen/list_child_left_padding"
+        android:layout_toRightOf="@id/called"
         android:textSize="@dimen/list_text_size"
-        android:background="@drawable/selector"
-        android:focusable="false" />
+        android:layout_marginLeft="@dimen/phone_number_margin_left"/>
 
     <ImageView
         android:layout_width="wrap_content"

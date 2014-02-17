@@ -1,7 +1,6 @@
 package ru.dmide.dubnataxi;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -25,7 +24,6 @@ import com.haarman.listviewanimations.swinginadapters.AnimationAdapter;
 import com.haarman.listviewanimations.swinginadapters.prepared.ScaleInAnimationAdapter;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Set;
@@ -64,7 +62,7 @@ public class MainActivity extends ActionBarActivity {
                 })
                 .setup(pullToRefreshLayout);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            new GetCalledNumbersTask().execute(this);
+            new GetCalledNumbersTask().execute();
         }
         updateContent(true);
     }
@@ -115,7 +113,7 @@ public class MainActivity extends ActionBarActivity {
                 });
                 dismissAdapter.setAbsListView(phonesList);
                 phonesList.setAdapter(dismissAdapter);
-                setChildsListener(phonesAdapter, phonesList);
+                setChildsListener(phonesList);
                 AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).
                         setView(phonesList).
                         create();
@@ -124,20 +122,24 @@ public class MainActivity extends ActionBarActivity {
         });
     }
 
-    private void setChildsListener(final PhonesAdapter phonesAdapter, ListView list) {
+    public Set<String> getCalledNumbers() {
+        return calledNumbers;
+    }
+
+    private void setChildsListener(ListView list) {
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 TextView numberTV = viewById(view, R.id.phone_number_tv);
                 Intent callIntent = new Intent(Intent.ACTION_CALL);
                 String number = numberTV.getText().toString();
+                callIntent.setData(Uri.parse("tel:" + number));
                 calledNumbers.add(number);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                    new SaveCalledNumbersTask().execute(MainActivity.this);
+                    new SaveCalledNumbersTask(callIntent).execute();
+                } else {
+                    startActivity(callIntent);
                 }
-                callIntent.setData(Uri.parse("tel:" + number));
-                startActivity(callIntent);
-                phonesAdapter.setSelected(position);
                 servicesAdapter.notifyDataSetChanged();
             }
         });
@@ -148,22 +150,35 @@ public class MainActivity extends ActionBarActivity {
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    private class GetCalledNumbersTask extends AsyncTask<Activity, Void, Void> {
+    private class GetCalledNumbersTask extends AsyncTask<Void, Void, Void> {
+
         @Override
-        protected Void doInBackground(Activity... params) {
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(params[0]);
-            calledNumbers = preferences.getStringSet(CALLED_NUMS, Collections.EMPTY_SET);
+        protected Void doInBackground(Void... params) {
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+            //creating a copy of Set due to a bug in API: http://stackoverflow.com/a/17470210/2093236
+            calledNumbers = new HashSet<String>(preferences.getStringSet(CALLED_NUMS, new HashSet<String>()));
             return null;
         }
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    private class SaveCalledNumbersTask extends AsyncTask<Activity, Void, Void> {
+    private class SaveCalledNumbersTask extends AsyncTask<Void, Void, Void> {
+        private Intent intent;
+
+        SaveCalledNumbersTask(Intent intent) {
+            this.intent = intent;
+        }
+
         @Override
-        protected Void doInBackground(Activity... params) {
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(params[0]);
+        protected Void doInBackground(Void... params) {
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
             preferences.edit().putStringSet(CALLED_NUMS, calledNumbers).commit();
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            MainActivity.this.startActivity(intent);
         }
     }
 }

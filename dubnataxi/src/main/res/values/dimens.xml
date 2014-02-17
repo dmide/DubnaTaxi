@@ -6,6 +6,8 @@
     <dimen name="list_child_left_padding">15dp</dimen>
     <dimen name="list_parent_left_padding">20dp</dimen>
     <dimen name="drawable_padding">10dp</dimen>
+    <dimen name="called_drawable_paddingtop">20dp</dimen>
+    <dimen name="phone_number_margin_left">5dp</dimen>
 
     <dimen name="list_text_size">20sp</dimen>
 
