@@ -14,8 +14,10 @@ public class ServicesAdapter extends ArrayAdapter {
     private final LayoutInflater inflater;
     private ArrayList<String> services;
     private final int listItemHeight;
+    private ModelFragment model;
 
-    public ServicesAdapter(MainActivity activity) {
+    public ServicesAdapter(MainActivity activity, ModelFragment model) {
+        this.model = model;
         inflater = activity.getLayoutInflater();
         listItemHeight = (int) activity.getResources().getDimension(R.dimen.list_item_height);
     }

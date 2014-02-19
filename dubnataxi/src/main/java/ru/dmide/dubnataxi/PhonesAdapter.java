@@ -8,9 +8,6 @@ import android.widget.TextView;
 import com.haarman.listviewanimations.ArrayAdapter;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Created by dmide on 16/02/14.
@@ -20,9 +17,11 @@ public class PhonesAdapter extends ArrayAdapter {
     private final int listItemHeight;
     private ArrayList<String> phones;
     private MainActivity activity;
+    private ModelFragment model;
 
-    public PhonesAdapter(MainActivity activity) {
+    public PhonesAdapter(MainActivity activity, ModelFragment model) {
         this.activity = activity;
+        this.model = model;
         inflater = activity.getLayoutInflater();
         listItemHeight = (int) activity.getResources().getDimension(R.dimen.list_item_height);
     }
@@ -41,7 +40,7 @@ public class PhonesAdapter extends ArrayAdapter {
         textView.setHeight(listItemHeight);
         String phone = phones.get(position);
         textView.setText(phone);
-        if (activity.getCalledNumbers().contains(phone)){
+        if (model.getCalledNumbers().contains(phone)){
             convertView.findViewById(R.id.called).setVisibility(View.VISIBLE);
         } else {
             convertView.findViewById(R.id.called).setVisibility(View.INVISIBLE);
