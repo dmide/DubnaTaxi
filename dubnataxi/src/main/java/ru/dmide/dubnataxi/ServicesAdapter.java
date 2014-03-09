@@ -9,6 +9,8 @@ import com.haarman.listviewanimations.ArrayAdapter;
 
 import java.util.ArrayList;
 
+import static ru.dmide.dubnataxi.BaseActivity.viewById;
+
 public class ServicesAdapter extends ArrayAdapter {
 
     private final LayoutInflater inflater;
@@ -32,7 +34,7 @@ public class ServicesAdapter extends ArrayAdapter {
         if (convertView == null) {
             convertView = inflater.inflate(R.layout.group_view, null);
         }
-        TextView textView = (TextView) convertView.findViewById(R.id.text);
+        TextView textView = viewById(convertView, R.id.text);
         textView.setText(services.get(position));
         textView.setHeight(listItemHeight);
         return convertView;

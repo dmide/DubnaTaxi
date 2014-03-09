@@ -7,7 +7,12 @@
     <dimen name="list_parent_left_padding">20dp</dimen>
     <dimen name="drawable_padding">10dp</dimen>
     <dimen name="called_drawable_paddingtop">20dp</dimen>
+    <dimen name="info_text_padding">10dp</dimen>
+    <dimen name="info_btn_margin">10dp</dimen>
+    <dimen name="info_btn_padding">5dp</dimen>
     <dimen name="phone_number_margin_left">5dp</dimen>
+    <dimen name="info_btn_width">200dp</dimen>
+    <dimen name="info_btn_height">70dp</dimen>
 
     <dimen name="list_text_size">20sp</dimen>
 

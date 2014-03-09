@@ -1,6 +1,7 @@
 package ru.dmide.dubnataxi;
 
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
@@ -23,7 +24,7 @@ import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends BaseActivity {
     public static String MODEL = "MODEL";
 
     private ModelFragment model;
@@ -37,10 +38,10 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        servicesListView = (ListView) findViewById(R.id.list);
+        servicesListView = viewById(R.id.list);
         servicesListView.setDivider(null);
 
-        pullToRefreshLayout = (PullToRefreshLayout) findViewById(R.id.ptr_layout);
+        pullToRefreshLayout = viewById(R.id.ptr_layout);
         ActionBarPullToRefresh.from(this)
                 .allChildrenArePullable()
                 .listener(new OnRefreshListener() {
@@ -72,6 +73,10 @@ public class MainActivity extends ActionBarActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.info:
+                Intent i = new Intent(this, InfoActivity.class);
+                startActivity(i);
+                return true;
             case R.id.action_settings:
                 return true;
         }
@@ -91,14 +96,6 @@ public class MainActivity extends ActionBarActivity {
                 onServiceClick(groupPos);
             }
         });
-    }
-
-    public <T extends View> T viewById(View parent, int id) {
-        return (T) parent.findViewById(id);
-    }
-
-    protected <T extends View> T viewById(int id) {
-        return (T) findViewById(id);
     }
 
     private void onServiceClick(final int groupPos) {
@@ -137,9 +134,9 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void updateContent(boolean useCache) {
-        new ContentLoadTask(this, pullToRefreshLayout, useCache).execute();
         if (!useCache) {
             controller.clearDeletedValues();
         }
+        new ContentLoadTask(this, pullToRefreshLayout, useCache).execute();
     }
 }

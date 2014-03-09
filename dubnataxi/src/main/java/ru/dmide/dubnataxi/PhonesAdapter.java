@@ -9,6 +9,8 @@ import com.haarman.listviewanimations.ArrayAdapter;
 
 import java.util.ArrayList;
 
+import static ru.dmide.dubnataxi.BaseActivity.viewById;
+
 /**
  * Created by dmide on 16/02/14.
  */
@@ -36,14 +38,14 @@ public class PhonesAdapter extends ArrayAdapter {
         if (convertView == null) {
             convertView = inflater.inflate(R.layout.child_view, null);
         }
-        TextView textView = (TextView) convertView.findViewById(R.id.phone_number_tv);
+        TextView textView = viewById(convertView, R.id.phone_number_tv);
         textView.setHeight(listItemHeight);
         String phone = phones.get(position);
         textView.setText(phone);
-        if (model.getCalledNumbers().contains(phone)){
-            convertView.findViewById(R.id.called).setVisibility(View.VISIBLE);
+        if (model.getCalledNumbers().contains(phone)) {
+            viewById(convertView, R.id.called).setVisibility(View.VISIBLE);
         } else {
-            convertView.findViewById(R.id.called).setVisibility(View.INVISIBLE);
+            viewById(convertView, R.id.called).setVisibility(View.INVISIBLE);
         }
         return convertView;
     }
