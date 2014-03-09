@@ -6,13 +6,13 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.json.parsers.JSONParser;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Map;
 
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
 
@@ -61,18 +61,26 @@ public class ContentLoadTask extends AsyncTask<Void, Void, Void> {
         if (e == null) {
             String pageStr = page.toString();
             preferences.edit().putString(CONTENT, pageStr).apply();
-            JSONParser parser = new JSONParser();
-            String content = pageStr;
-            Map jsonData = parser.parseJson(content);
-            String name;
-            ArrayList<String> numbers;
-            ArrayList<HashMap> serviceList = (ArrayList<HashMap>) jsonData.get("objects");
-            for (HashMap service : serviceList) {
-                name = (String) service.get("name");
-                numbers = (ArrayList) service.get("numbers");
-                taxiNumbersTree.put(name, numbers);
+            try {
+                JSONObject jsonObject = new JSONObject(pageStr);
+                String name;
+                ArrayList<String> numbersList = new ArrayList<String>();
+                JSONArray serviceList = (JSONArray) jsonObject.get("objects");
+                for (int i = 0; i < serviceList.length(); i++) {
+                    JSONObject service = (JSONObject) serviceList.get(i);
+                    name = (String) service.get("name");
+                    JSONArray numbers = (JSONArray) service.get("numbers");
+                    numbersList.clear();
+                    for (int j = 0; j < numbers.length(); j++) {
+                        numbersList.add((String) numbers.get(j));
+                    }
+                    taxiNumbersTree.put(name, numbersList);
+                }
+                activity.processContent(taxiNumbersTree);
+            } catch (JSONException e1) {
+                Toast.makeText(activity, activity.getString(R.string.problem),
+                        Toast.LENGTH_LONG).show();
             }
-            activity.processContent(taxiNumbersTree);
         } else {
             Toast.makeText(activity, activity.getString(R.string.problem),
                     Toast.LENGTH_LONG).show();
