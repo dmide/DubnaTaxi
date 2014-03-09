@@ -1,0 +1,50 @@
+<RelativeLayout
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <TextView
+        style="@style/info_text"
+        android:id="@+id/info1"
+        android:text="@string/info1"
+        android:layout_alignParentTop="true" />
+
+    <TextView
+        style="@style/info_text"
+        android:id="@+id/info2"
+        android:text="@string/info2"
+        android:layout_below="@id/info1" />
+
+    <TextView
+        style="@style/info_text"
+        android:id="@+id/sources"
+        android:layout_below="@id/info2" />
+
+    <TextView
+        style="@style/info_text"
+        android:id="@+id/mail_to"
+        android:layout_below="@id/sources" />
+
+    <View
+        android:id="@+id/center"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerInParent="true" />
+
+    <Button
+        style="@style/info_btn"
+        android:id="@+id/rate_btn"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@id/center"
+        android:text="@string/rate_app" />
+
+    <Button
+        style="@style/info_btn"
+        android:id="@+id/donate_btn"
+        android:layout_alignParentBottom="true"
+        android:layout_toRightOf="@id/center"
+        android:text="@string/donate" />
+
+</RelativeLayout>
