@@ -15,6 +15,10 @@
     <string name="rate_app">Оценить на\nGoogle Play</string>
     <string name="donate">Поддержать $</string>
     <string name="google_play_link">https://play.google.com/store/apps/details?id=ru.dmide.dubnataxi</string>
+    <string name="rate_question">Спасибо за использование программы! Может быть, хотите оставить оценку на Google Play?</string>
+    <string name="do_not_show">Больше не показывать</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
 
 
 </resources>

@@ -87,7 +87,7 @@ public class ModelFragment extends android.support.v4.app.Fragment {
     class GetCalledNumbersTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mainActivity);
+            SharedPreferences preferences = mainActivity.getSharedPreferences();
             //creating a copy of Set due to a bug in API: http://stackoverflow.com/a/17470210/2093236
             calledNumbers = new HashSet<String>(preferences.getStringSet(CALLED_NUMS, new HashSet<String>()));
             return null;
@@ -98,7 +98,7 @@ public class ModelFragment extends android.support.v4.app.Fragment {
     class SaveCalledNumbersTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mainActivity);
+            SharedPreferences preferences = mainActivity.getSharedPreferences();
             preferences.edit().putStringSet(CALLED_NUMS, calledNumbers).commit();
             return null;
         }
@@ -108,7 +108,7 @@ public class ModelFragment extends android.support.v4.app.Fragment {
     class GetDeletedNumbersTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mainActivity);
+            SharedPreferences preferences = mainActivity.getSharedPreferences();
             //creating a copy of Set due to a bug in API: http://stackoverflow.com/a/17470210/2093236
             deletedNumbers = new HashSet<String>(preferences.getStringSet(DELETED_NUMS, new HashSet<String>()));
             return null;
@@ -119,7 +119,7 @@ public class ModelFragment extends android.support.v4.app.Fragment {
     class SaveDeletedNumbersTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mainActivity);
+            SharedPreferences preferences = mainActivity.getSharedPreferences();
             preferences.edit().putStringSet(DELETED_NUMS, deletedNumbers).commit();
             return null;
         }
@@ -129,7 +129,7 @@ public class ModelFragment extends android.support.v4.app.Fragment {
     class GetDeletedServicesTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mainActivity);
+            SharedPreferences preferences = mainActivity.getSharedPreferences();
             //creating a copy of Set due to a bug in API: http://stackoverflow.com/a/17470210/2093236
             deletedServices = new HashSet<String>(preferences.getStringSet(DELETED_SERVICES, new HashSet<String>()));
             return null;
@@ -140,7 +140,7 @@ public class ModelFragment extends android.support.v4.app.Fragment {
     class SaveDeletedServicesTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mainActivity);
+            SharedPreferences preferences = mainActivity.getSharedPreferences();
             preferences.edit().putStringSet(DELETED_SERVICES, deletedServices).commit();
             return null;
         }

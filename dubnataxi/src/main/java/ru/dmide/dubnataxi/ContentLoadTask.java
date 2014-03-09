@@ -34,7 +34,7 @@ public class ContentLoadTask extends AsyncTask<Void, Void, Void> {
         this.activity = activity;
         this.pullToRefreshLayout = pullToRefreshLayout;
         this.useCache = useCache;
-        preferences = PreferenceManager.getDefaultSharedPreferences(activity);
+        preferences = activity.getSharedPreferences();
     }
 
     @Override
