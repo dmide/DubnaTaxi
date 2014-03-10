@@ -64,13 +64,12 @@ public class ContentLoadTask extends AsyncTask<Void, Void, Void> {
             try {
                 JSONObject jsonObject = new JSONObject(pageStr);
                 String name;
-                ArrayList<String> numbersList = new ArrayList<String>();
                 JSONArray serviceList = (JSONArray) jsonObject.get("objects");
                 for (int i = 0; i < serviceList.length(); i++) {
                     JSONObject service = (JSONObject) serviceList.get(i);
                     name = (String) service.get("name");
                     JSONArray numbers = (JSONArray) service.get("numbers");
-                    numbersList.clear();
+                    ArrayList<String> numbersList = new ArrayList<String>();
                     for (int j = 0; j < numbers.length(); j++) {
                         numbersList.add((String) numbers.get(j));
                     }
