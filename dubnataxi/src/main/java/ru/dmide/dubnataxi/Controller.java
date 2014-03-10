@@ -2,8 +2,6 @@ package ru.dmide.dubnataxi;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
-import android.view.View;
 
 /**
  * Created by drevis on 19.02.14.
@@ -20,34 +18,26 @@ public class Controller {
         Intent callIntent = new Intent(Intent.ACTION_CALL);
         callIntent.setData(Uri.parse("tel:" + number));
         model.calledNumbers.add(number);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            model.new SaveCalledNumbersTask().execute();
-        }
+        model.new SaveJsonTask(ModelFragment.CALLED_NUMS).execute();
         model.getMainActivity().startActivity(callIntent);
         model.getPhonesAdapter().notifyDataSetChanged();
     }
 
     public void deleteNumber(String numberToDelete) {
         model.deletedNumbers.add(numberToDelete);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            model.new SaveDeletedNumbersTask().execute();
-        }
+        model.new SaveJsonTask(ModelFragment.DELETED_NUMS).execute();
     }
 
     public void deleteCurrentService() {
         model.deletedServices.add(model.currentService);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            model.new SaveDeletedServicesTask().execute();
-        }
+        model.new SaveJsonTask(ModelFragment.DELETED_SERVICES).execute();
         model.initServicesAdapter();
     }
 
     public void clearDeletedValues() {
         model.deletedNumbers.clear();
         model.deletedServices.clear();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            model.new SaveDeletedNumbersTask().execute();
-            model.new SaveDeletedServicesTask().execute();
-        }
+        model.new SaveJsonTask(ModelFragment.DELETED_NUMS).execute();
+        model.new SaveJsonTask(ModelFragment.DELETED_SERVICES).execute();
     }
 }

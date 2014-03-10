@@ -1,36 +1,45 @@
 package ru.dmide.dubnataxi;
 
-import android.annotation.TargetApi;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.preference.PreferenceManager;
+
+import org.json.JSONArray;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
  * Created by drevis on 19.02.14.
  */
 public class ModelFragment extends android.support.v4.app.Fragment {
-    private static final String CALLED_NUMS = "CALLED_NUMS";
-    private static final String DELETED_NUMS = "DELETED_NUMS";
-    private static final String DELETED_SERVICES = "DELETED_SERVICES";
+    public static final String CALLED_NUMS = "CALLED_NUMS";
+    public static final String DELETED_NUMS = "DELETED_NUMS";
+    public static final String DELETED_SERVICES = "DELETED_SERVICES";
 
     Set<String> calledNumbers = new HashSet<String>();
     Set<String> deletedNumbers = new HashSet<String>();
     Set<String> deletedServices = new HashSet<String>();
     String currentService;
 
+    private Map<String, Set<String>> numbersMap = new HashMap<String, Set<String>>();
     private HashMap<String, ArrayList<String>> taxiNumbersTree;
     private ServicesAdapter servicesAdapter;
     private PhonesAdapter phonesAdapter;
     private MainActivity mainActivity;
+    private SharedPreferences sharedPreferences;
 
     public void init(MainActivity mainActivity) {
         this.mainActivity = mainActivity;
+        sharedPreferences = mainActivity.getSharedPreferences();
+
+        numbersMap.put(CALLED_NUMS, calledNumbers);
+        numbersMap.put(DELETED_NUMS, deletedNumbers);
+        numbersMap.put(DELETED_SERVICES, deletedServices);
+
         servicesAdapter = new ServicesAdapter(mainActivity, this);
         phonesAdapter = new PhonesAdapter(mainActivity, this);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
@@ -65,7 +74,7 @@ public class ModelFragment extends android.support.v4.app.Fragment {
         return calledNumbers;
     }
 
-    public MainActivity getMainActivity(){
+    public MainActivity getMainActivity() {
         return mainActivity;
     }
 
@@ -78,72 +87,40 @@ public class ModelFragment extends android.support.v4.app.Fragment {
     }
 
     private void loadSavedActions() {
-        new GetCalledNumbersTask().execute();
-        new GetDeletedNumbersTask().execute();
-        new GetDeletedServicesTask().execute();
+        new LoadJsonTask(CALLED_NUMS).execute();
+        new LoadJsonTask(DELETED_NUMS).execute();
+        new LoadJsonTask(DELETED_SERVICES).execute();
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    class GetCalledNumbersTask extends AsyncTask<Void, Void, Void> {
+
+    class LoadJsonTask extends AsyncTask<Void, Void, Void> {
+        private String identifier;
+
+        LoadJsonTask(String identifier) {
+            this.identifier = identifier;
+        }
+
         @Override
         protected Void doInBackground(Void... params) {
-            SharedPreferences preferences = mainActivity.getSharedPreferences();
-            //creating a copy of Set due to a bug in API: http://stackoverflow.com/a/17470210/2093236
-            calledNumbers = new HashSet<String>(preferences.getStringSet(CALLED_NUMS, new HashSet<String>()));
+            Set<String> container = numbersMap.get(identifier);
+            JSONArray jsonArray = JsonPrefsHelper.loadJSONArray(sharedPreferences, identifier);
+            container = JsonPrefsHelper.jsonToSet(jsonArray);
             return null;
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    class SaveCalledNumbersTask extends AsyncTask<Void, Void, Void> {
+    class SaveJsonTask extends AsyncTask<Void, Void, Void> {
+        private String identifier;
+
+        SaveJsonTask(String identifier) {
+            this.identifier = identifier;
+        }
+
         @Override
         protected Void doInBackground(Void... params) {
-            SharedPreferences preferences = mainActivity.getSharedPreferences();
-            preferences.edit().putStringSet(CALLED_NUMS, calledNumbers).commit();
+            Set<String> container = numbersMap.get(identifier);
+            JsonPrefsHelper.saveJSONArray(sharedPreferences, identifier, new JSONArray(container));
             return null;
         }
     }
-
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    class GetDeletedNumbersTask extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected Void doInBackground(Void... params) {
-            SharedPreferences preferences = mainActivity.getSharedPreferences();
-            //creating a copy of Set due to a bug in API: http://stackoverflow.com/a/17470210/2093236
-            deletedNumbers = new HashSet<String>(preferences.getStringSet(DELETED_NUMS, new HashSet<String>()));
-            return null;
-        }
-    }
-
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    class SaveDeletedNumbersTask extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected Void doInBackground(Void... params) {
-            SharedPreferences preferences = mainActivity.getSharedPreferences();
-            preferences.edit().putStringSet(DELETED_NUMS, deletedNumbers).commit();
-            return null;
-        }
-    }
-
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    class GetDeletedServicesTask extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected Void doInBackground(Void... params) {
-            SharedPreferences preferences = mainActivity.getSharedPreferences();
-            //creating a copy of Set due to a bug in API: http://stackoverflow.com/a/17470210/2093236
-            deletedServices = new HashSet<String>(preferences.getStringSet(DELETED_SERVICES, new HashSet<String>()));
-            return null;
-        }
-    }
-
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    class SaveDeletedServicesTask extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected Void doInBackground(Void... params) {
-            SharedPreferences preferences = mainActivity.getSharedPreferences();
-            preferences.edit().putStringSet(DELETED_SERVICES, deletedServices).commit();
-            return null;
-        }
-    }
-
 }
