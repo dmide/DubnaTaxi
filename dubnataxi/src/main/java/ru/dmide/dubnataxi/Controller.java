@@ -24,7 +24,7 @@ public class Controller {
             model.new SaveCalledNumbersTask().execute();
         }
         model.getMainActivity().startActivity(callIntent);
-        model.getServicesAdapter().notifyDataSetChanged();
+        model.getPhonesAdapter().notifyDataSetChanged();
     }
 
     public void deleteNumber(String numberToDelete) {

@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name">DubnaTaxi</string>
-    <string name="action_settings">Настройки</string>
+    <string name="action_clear">Восстановить список</string>
     <string name="problem">Не удается получить данные, проблемы с соединением. Попробуйте повторить действие.</string>
     <string name="cancel">Отмена</string>
     <string name="title_activity_info">О программе</string>

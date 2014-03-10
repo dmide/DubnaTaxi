@@ -30,7 +30,7 @@ import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
 public class MainActivity extends BaseActivity {
     public static final String MODEL = "MODEL";
-    private static final String TO_RATE_OR_NOT_TO_RATE = "TO_RATE_OR_NOT_TO_RATE";
+    public static final String TO_RATE_OR_NOT_TO_RATE = "TO_RATE_OR_NOT_TO_RATE";
 
     private ModelFragment model;
     private Controller controller;
@@ -54,7 +54,7 @@ public class MainActivity extends BaseActivity {
                 .listener(new OnRefreshListener() {
                     @Override
                     public void onRefreshStarted(View view) {
-                        updateContent(false);
+                        updateContent(false, false);
                     }
                 })
                 .setup(pullToRefreshLayout);
@@ -65,11 +65,12 @@ public class MainActivity extends BaseActivity {
             model = new ModelFragment();
             model.setRetainInstance(true);
             fragmentManager.beginTransaction().add(model, MODEL);
-            updateContent(true);
+            updateContent(true, false);
         }
         model.init(this);
         controller = new Controller(model);
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -84,7 +85,8 @@ public class MainActivity extends BaseActivity {
                 Intent i = new Intent(this, InfoActivity.class);
                 startActivity(i);
                 return true;
-            case R.id.action_settings:
+            case R.id.action_clear:
+                updateContent(false, true);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -98,7 +100,7 @@ public class MainActivity extends BaseActivity {
             checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    preferences.edit().putBoolean(TO_RATE_OR_NOT_TO_RATE, false).apply();
+                    preferences.edit().putBoolean(TO_RATE_OR_NOT_TO_RATE, false).commit();
                 }
             });
             new AlertDialog.Builder(this)
@@ -176,8 +178,9 @@ public class MainActivity extends BaseActivity {
         });
     }
 
-    private void updateContent(boolean useCache) {
-        if (!useCache) {
+    private void updateContent(boolean useCache, boolean clear) {
+        pullToRefreshLayout.setRefreshing(true);
+        if (clear) {
             controller.clearDeletedValues();
         }
         new ContentLoadTask(this, pullToRefreshLayout, useCache).execute();
