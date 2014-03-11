@@ -20,5 +20,17 @@
     <string name="yes">Да</string>
     <string name="no">Нет</string>
 
+    <string-array name="donation_google_catalog_values">
+        <item>1$</item>
+        <item>2$</item>
+        <item>3$</item>
+        <item>5$</item>
+        <item>8$</item>
+        <item>13$</item>
+    </string-array>
+
+    <string name="title_activity_donate">DonateActivity</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
 
 </resources>

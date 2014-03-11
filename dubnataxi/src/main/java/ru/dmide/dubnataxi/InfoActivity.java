@@ -1,16 +1,25 @@
 package ru.dmide.dubnataxi;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.DialogFragment;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.sufficientlysecure.donations.DonationsFragment;
 
 public class InfoActivity extends BaseActivity {
 
@@ -44,10 +53,9 @@ public class InfoActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 checkRated();
-                Toast.makeText(InfoActivity.this, "Будет доступно позже", Toast.LENGTH_SHORT).show();
-//                DonationsFragment donationsFragment = DonationsFragment.newInstance(BuildConfig.DEBUG, true, GOOGLE_PUBKEY, GOOGLE_CATALOG,
-//                        getResources().getStringArray(R.array.donation_google_catalog_values), false, null, null,
-//                        null, false, null, null);
+                Intent i = new Intent(InfoActivity.this, DonateActivity.class);
+                startActivity(i);
+//                Toast.makeText(InfoActivity.this, "Будет доступно позже", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -67,5 +75,4 @@ public class InfoActivity extends BaseActivity {
                 .putBoolean(MainActivity.TO_RATE_OR_NOT_TO_RATE, false)
                 .commit();
     }
-
 }
