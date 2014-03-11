@@ -2,7 +2,6 @@ package ru.dmide.dubnataxi;
 
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.os.Build;
 
 import org.json.JSONArray;
 
@@ -42,9 +41,8 @@ public class ModelFragment extends android.support.v4.app.Fragment {
 
         servicesAdapter = new ServicesAdapter(mainActivity, this);
         phonesAdapter = new PhonesAdapter(mainActivity, this);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            loadSavedActions();
-        }
+        loadSavedActions();
+        mainActivity.updateContent(true, false);
     }
 
     public void initContent(HashMap<String, ArrayList<String>> taxiNumbersTree) {
@@ -52,7 +50,7 @@ public class ModelFragment extends android.support.v4.app.Fragment {
         initServicesAdapter();
     }
 
-    public boolean initNumbers(int pos) {
+    public boolean initPhonesAdapter(int pos) {
         ArrayList<String> servicesList = new ArrayList<String>(taxiNumbersTree.keySet());
         currentService = servicesList.get(pos);
         ArrayList<String> phones = taxiNumbersTree.get(currentService);
@@ -68,6 +66,7 @@ public class ModelFragment extends android.support.v4.app.Fragment {
         Set<String> services = taxiNumbersTree.keySet();
         services.removeAll(deletedServices);
         servicesAdapter.init(new ArrayList<String>(services));
+        mainActivity.initServicesList();
     }
 
     public Set<String> getCalledNumbers() {
@@ -87,26 +86,15 @@ public class ModelFragment extends android.support.v4.app.Fragment {
     }
 
     private void loadSavedActions() {
-        new LoadJsonTask(CALLED_NUMS).execute();
-        new LoadJsonTask(DELETED_NUMS).execute();
-        new LoadJsonTask(DELETED_SERVICES).execute();
+        LoadJson(DELETED_SERVICES);
+        LoadJson(DELETED_NUMS);
+        LoadJson(CALLED_NUMS);
     }
 
-
-    class LoadJsonTask extends AsyncTask<Void, Void, Void> {
-        private String identifier;
-
-        LoadJsonTask(String identifier) {
-            this.identifier = identifier;
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            Set<String> container = numbersMap.get(identifier);
-            JSONArray jsonArray = JsonPrefsHelper.loadJSONArray(sharedPreferences, identifier);
-            container = JsonPrefsHelper.jsonToSet(jsonArray);
-            return null;
-        }
+    private void LoadJson(String identifier) {
+        Set<String> container = numbersMap.get(identifier);
+        JSONArray jsonArray = JsonPrefsHelper.loadJSONArray(sharedPreferences, identifier);
+        container.addAll(JsonPrefsHelper.jsonToSet(jsonArray));
     }
 
     class SaveJsonTask extends AsyncTask<Void, Void, Void> {

@@ -60,7 +60,7 @@ public class ContentLoadTask extends AsyncTask<Void, Void, Void> {
     public void onPostExecute(Void params) {
         if (e == null) {
             String pageStr = page.toString();
-            preferences.edit().putString(CONTENT, pageStr).apply();
+            preferences.edit().putString(CONTENT, pageStr).commit();
             try {
                 JSONObject jsonObject = new JSONObject(pageStr);
                 String name;
@@ -75,7 +75,7 @@ public class ContentLoadTask extends AsyncTask<Void, Void, Void> {
                     }
                     taxiNumbersTree.put(name, numbersList);
                 }
-                activity.processContent(taxiNumbersTree);
+                activity.getModel().initContent(taxiNumbersTree);
             } catch (JSONException e1) {
                 Toast.makeText(activity, activity.getString(R.string.problem),
                         Toast.LENGTH_LONG).show();

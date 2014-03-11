@@ -36,7 +36,6 @@ public class MainActivity extends BaseActivity {
     private Controller controller;
     private ListView servicesListView;
     private SharedPreferences preferences;
-
     private PullToRefreshLayout pullToRefreshLayout;
 
     @Override
@@ -65,12 +64,10 @@ public class MainActivity extends BaseActivity {
             model = new ModelFragment();
             model.setRetainInstance(true);
             fragmentManager.beginTransaction().add(model, MODEL);
-            updateContent(true, false);
         }
         model.init(this);
         controller = new Controller(model);
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -100,7 +97,7 @@ public class MainActivity extends BaseActivity {
             checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    preferences.edit().putBoolean(TO_RATE_OR_NOT_TO_RATE, false).commit();
+                    preferences.edit().putBoolean(TO_RATE_OR_NOT_TO_RATE, !isChecked).commit();
                 }
             });
             new AlertDialog.Builder(this)
@@ -118,6 +115,7 @@ public class MainActivity extends BaseActivity {
                             finish();
                         }
                     })
+                    .setInverseBackgroundForced(true)
                     .show();
         } else {
             super.onBackPressed();
@@ -128,9 +126,7 @@ public class MainActivity extends BaseActivity {
         return preferences;
     }
 
-    public void processContent(LinkedHashMap<String, ArrayList<String>> taxiNumbersTree) {
-        model.initContent(taxiNumbersTree);
-
+    void initServicesList(){
         AnimationAdapter animAdapter = new ScaleInAnimationAdapter(model.getServicesAdapter());
         animAdapter.setAbsListView(servicesListView);
         servicesListView.setAdapter(animAdapter);
@@ -138,48 +134,19 @@ public class MainActivity extends BaseActivity {
         servicesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int groupPos, long id) {
-                onServiceClick(groupPos);
+                controller.onServiceClick(groupPos, MainActivity.this);
             }
         });
     }
 
-    private void onServiceClick(final int groupPos) {
-        model.initNumbers(groupPos);
-        ListView phonesList = new ListView(this);
-        final AlertDialog dialog = new AlertDialog.Builder(this).
-                setView(phonesList).
-                create();
-        SwipeDismissAdapter dismissAdapter = new SwipeDismissAdapter(model.getPhonesAdapter(), new OnDismissCallback() {
-            @Override
-            public void onDismiss(AbsListView absListView, int[] ints) {
-                String number = (String) absListView.getItemAtPosition(ints[0]);
-                controller.deleteNumber(number);
-                boolean isEmpty = !model.initNumbers(groupPos);
-                if (isEmpty) {
-                    controller.deleteCurrentService();
-                    dialog.dismiss();
-                }
-            }
-        });
-        dismissAdapter.setAbsListView(phonesList);
-        phonesList.setAdapter(dismissAdapter);
-        setChildsListener(phonesList);
-        dialog.show();
+    ModelFragment getModel() {
+        return model;
     }
 
-    private void setChildsListener(ListView list) {
-        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                TextView numberTV = viewById(view, R.id.phone_number_tv);
-                String number = numberTV.getText().toString();
-                controller.callNumber(number);
-            }
-        });
-    }
-
-    private void updateContent(boolean useCache, boolean clear) {
-        pullToRefreshLayout.setRefreshing(true);
+    void updateContent(boolean useCache, boolean clear) {
+        if (pullToRefreshLayout != null) {
+            pullToRefreshLayout.setRefreshing(true);
+        }
         if (clear) {
             controller.clearDeletedValues();
         }
