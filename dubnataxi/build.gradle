@@ -3,7 +3,7 @@ apply plugin: 'android'
 dependencies {
     compile 'com.android.support:appcompat-v7:19.0.+'
     compile 'com.android.support:support-v4:19.0.1'
-    compile 'com.github.chrisbanes.actionbarpulltorefresh:extra-abc:+'
+    compile 'com.github.chrisbanes.actionbarpulltorefresh:extra-abc:0.9.2'
     compile 'com.nhaarman.listviewanimations:library:2.5.2'
     compile project(':Donations')
 }
