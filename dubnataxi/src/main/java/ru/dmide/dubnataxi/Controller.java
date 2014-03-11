@@ -57,6 +57,7 @@ public class Controller {
         model.initPhonesAdapter(groupPos);
         ListView phonesList = new ListView(activity);
         final AlertDialog dialog = new AlertDialog.Builder(activity).
+                setTitle(model.currentService).
                 setView(phonesList).
                 create();
         SwipeDismissAdapter dismissAdapter = new SwipeDismissAdapter(model.getPhonesAdapter(), new OnDismissCallback() {
