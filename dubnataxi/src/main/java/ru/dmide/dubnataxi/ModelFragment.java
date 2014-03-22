@@ -8,6 +8,7 @@ import org.json.JSONArray;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -53,7 +54,7 @@ public class ModelFragment extends android.support.v4.app.Fragment {
     public boolean initPhonesAdapter(int pos) {
         ArrayList<String> servicesList = new ArrayList<String>(taxiNumbersTree.keySet());
         currentService = servicesList.get(pos);
-        ArrayList<String> phones = taxiNumbersTree.get(currentService);
+        ArrayList<String> phones = new ArrayList<String>(taxiNumbersTree.get(currentService));
         phones.removeAll(deletedNumbers);
         if (phones.isEmpty()) {
             return false;

@@ -2,6 +2,8 @@ package ru.dmide.dubnataxi;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.view.View;
@@ -13,6 +15,9 @@ import android.widget.TextView;
 import com.haarman.listviewanimations.itemmanipulation.OnDismissCallback;
 import com.haarman.listviewanimations.itemmanipulation.SwipeDismissAdapter;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import static ru.dmide.dubnataxi.BaseActivity.viewById;
 
 /**
@@ -21,6 +26,7 @@ import static ru.dmide.dubnataxi.BaseActivity.viewById;
 public class Controller {
 
     private ModelFragment model;
+    private final Set<String> deleted = new HashSet<String>();
 
     Controller(ModelFragment model) {
         this.model = model;
@@ -40,6 +46,11 @@ public class Controller {
         model.new SaveJsonTask(ModelFragment.DELETED_NUMS).execute();
     }
 
+    public void restoreNumbers() {
+        model.deletedNumbers.removeAll(deleted);
+        model.new SaveJsonTask(ModelFragment.DELETED_NUMS).execute();
+    }
+
     public void deleteCurrentService() {
         model.deletedServices.add(model.currentService);
         model.new SaveJsonTask(ModelFragment.DELETED_SERVICES).execute();
@@ -53,29 +64,60 @@ public class Controller {
         model.new SaveJsonTask(ModelFragment.DELETED_SERVICES).execute();
     }
 
-    public void onServiceClick(final int groupPos, Activity activity) {
+    public void onServiceClick(final int groupPos, final Activity activity) {
+        deleted.clear();
         model.initPhonesAdapter(groupPos);
         ListView phonesList = new ListView(activity);
-        final AlertDialog dialog = new AlertDialog.Builder(activity).
-                setTitle(model.currentService).
-                setView(phonesList).
-                create();
+        final AlertDialog dialog = new AlertDialog.Builder(activity)
+                .setTitle(model.currentService)
+                .setView(phonesList)
+                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        restoreNumbers();
+                    }
+                })
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                })
+                .create();
         SwipeDismissAdapter dismissAdapter = new SwipeDismissAdapter(model.getPhonesAdapter(), new OnDismissCallback() {
             @Override
             public void onDismiss(AbsListView absListView, int[] ints) {
-                String number = (String) absListView.getItemAtPosition(ints[0]);
-                deleteNumber(number);
-                boolean isEmpty = !model.initPhonesAdapter(groupPos);
-                if (isEmpty) {
-                    deleteCurrentService();
-                    dialog.dismiss();
-                }
+                deletePhone((String) model.getPhonesAdapter().getItem(ints[0]), groupPos, activity, dialog);
             }
         });
         dismissAdapter.setAbsListView(phonesList);
         phonesList.setAdapter(dismissAdapter);
         setChildsListener(phonesList);
         dialog.show();
+    }
+
+    private void deletePhone(String itemAtPosition, final int groupPos, final Activity activity, Dialog dialog) {
+        deleted.add(itemAtPosition);
+        deleteNumber(itemAtPosition);
+        boolean isEmpty = !model.initPhonesAdapter(groupPos);
+        if (isEmpty) {
+            dialog.dismiss();
+            new AlertDialog.Builder(activity)
+                    .setTitle(R.string.delete_service)
+                    .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            restoreNumbers();
+                            onServiceClick(groupPos, activity);
+                        }
+                    })
+                    .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            deleteCurrentService();
+                        }
+                    })
+                    .show();
+        }
     }
 
     private void setChildsListener(ListView list) {
