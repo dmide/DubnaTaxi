@@ -2,7 +2,6 @@ package ru.dmide.dubnataxi;
 
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -34,7 +33,7 @@ public class ContentLoadTask extends AsyncTask<Void, Void, Void> {
         this.activity = activity;
         this.pullToRefreshLayout = pullToRefreshLayout;
         this.useCache = useCache;
-        preferences = activity.getSharedPreferences();
+        preferences = activity.getSharedPrefs();
     }
 
     @Override

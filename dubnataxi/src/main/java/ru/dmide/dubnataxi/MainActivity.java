@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.Menu;
@@ -15,6 +16,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.haarman.listviewanimations.itemmanipulation.OnDismissCallback;
 import com.haarman.listviewanimations.itemmanipulation.SwipeDismissAdapter;
@@ -78,12 +80,18 @@ public class MainActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.action_clear:
+                updateContent(false, true);
+                return true;
             case R.id.info:
                 Intent i = new Intent(this, InfoActivity.class);
                 startActivity(i);
                 return true;
-            case R.id.action_clear:
-                updateContent(false, true);
+            case R.id.action_where:
+                Uri uri = Uri.parse("geo:");
+                Intent w = new Intent(android.content.Intent.ACTION_VIEW, uri);
+                startActivity(w);
+                Toast.makeText(this, getString(R.string.face),Toast.LENGTH_SHORT).show();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -122,7 +130,7 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    public SharedPreferences getSharedPreferences() {
+    public SharedPreferences getSharedPrefs() {
         return preferences;
     }
 

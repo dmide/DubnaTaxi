@@ -6,11 +6,15 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.haarman.listviewanimations.itemmanipulation.OnDismissCallback;
 import com.haarman.listviewanimations.itemmanipulation.SwipeDismissAdapter;
@@ -24,6 +28,7 @@ import static ru.dmide.dubnataxi.BaseActivity.viewById;
  * Created by drevis on 19.02.14.
  */
 public class Controller {
+    private static final String PHONE_DELETION_INFO = "PHONE_DELETION_INFO";
 
     private ModelFragment model;
     private final Set<String> deleted = new HashSet<String>();
@@ -64,38 +69,50 @@ public class Controller {
         model.new SaveJsonTask(ModelFragment.DELETED_SERVICES).execute();
     }
 
-    public void onServiceClick(final int groupPos, final Activity activity) {
+    public void onServiceClick(final int groupPos, final MainActivity activity) {
         deleted.clear();
         model.initPhonesAdapter(groupPos);
-        ListView phonesList = new ListView(activity);
+        View view = activity.getLayoutInflater().inflate(R.layout.dialog_view, null);
+        final Button okBtn = viewById(view, R.id.ok);
+        final Button cancelBtn = viewById(view, R.id.cancel);
+        final LinearLayout buttons = viewById(view, R.id.buttons);
+        final ListView phonesList = viewById(view, R.id.list);
         final AlertDialog dialog = new AlertDialog.Builder(activity)
                 .setTitle(model.currentService)
-                .setView(phonesList)
-                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        restoreNumbers();
-                    }
-                })
-                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                })
+                .setView(view)
                 .create();
+        okBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        cancelBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                restoreNumbers();
+                dialog.dismiss();
+            }
+        });
         SwipeDismissAdapter dismissAdapter = new SwipeDismissAdapter(model.getPhonesAdapter(), new OnDismissCallback() {
             @Override
             public void onDismiss(AbsListView absListView, int[] ints) {
                 deletePhone((String) model.getPhonesAdapter().getItem(ints[0]), groupPos, activity, dialog);
+                buttons.setVisibility(View.VISIBLE);
+                Toast.makeText(activity, R.string.phone_deleted, Toast.LENGTH_SHORT).show();
             }
         });
         dismissAdapter.setAbsListView(phonesList);
         phonesList.setAdapter(dismissAdapter);
         setChildsListener(phonesList);
         dialog.show();
+        if (activity.getSharedPrefs().getBoolean(PHONE_DELETION_INFO, true)) {
+            Toast.makeText(activity, R.string.phone_deletion_desc, Toast.LENGTH_SHORT).show();
+            checkDeletionInfoShowed(activity);
+        }
     }
 
-    private void deletePhone(String itemAtPosition, final int groupPos, final Activity activity, Dialog dialog) {
+    private void deletePhone(String itemAtPosition, final int groupPos, final MainActivity activity, Dialog dialog) {
         deleted.add(itemAtPosition);
         deleteNumber(itemAtPosition);
         boolean isEmpty = !model.initPhonesAdapter(groupPos);
@@ -129,5 +146,12 @@ public class Controller {
                 callNumber(number);
             }
         });
+    }
+
+    private void checkDeletionInfoShowed(Activity activity) {
+        PreferenceManager.getDefaultSharedPreferences(activity)
+                .edit()
+                .putBoolean(PHONE_DELETION_INFO, false)
+                .commit();
     }
 }

@@ -1,6 +1,7 @@
 <!-- Base application theme. -->
 <resources>
-    <style name="Theme.MyTheme" parent="@style/Theme.Base.AppCompat.Light.DarkActionBar"/>
+
+    <style name="Theme.MyTheme" parent="@style/Theme.Base.AppCompat.Light.DarkActionBar" />
 
     <style name="info_text">
         <item name="android:padding">@dimen/info_text_padding</item>
@@ -12,7 +13,9 @@
     <style name="info_btn">
         <item name="android:layout_margin">@dimen/info_btn_margin</item>
         <item name="android:padding">@dimen/info_btn_padding</item>
-        <item name="android:layout_width">@dimen/info_btn_width</item>
+        <item name="android:background">@color/bg_item</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_weight">1</item>
         <item name="android:layout_height">@dimen/info_btn_height</item>
         <item name="android:textSize">@dimen/text_size_default</item>
     </style>
