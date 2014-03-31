@@ -33,6 +33,6 @@
         <item>Buy me 10 beers!</item>
     </string-array>
 
-    <string name="title_activity_donate">OK!</string>
+    <string name="title_activity_donate">Поддержать</string>
 
 </resources>
