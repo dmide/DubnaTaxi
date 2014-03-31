@@ -55,7 +55,6 @@ public class InfoActivity extends BaseActivity {
                 checkRated();
                 Intent i = new Intent(InfoActivity.this, DonateActivity.class);
                 startActivity(i);
-//                Toast.makeText(InfoActivity.this, "Будет доступно позже", Toast.LENGTH_SHORT).show();
             }
         });
     }

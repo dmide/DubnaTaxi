@@ -16,28 +16,35 @@
 
 package org.sufficientlysecure.donations;
 
-import android.content.ActivityNotFoundException;
-import android.view.*;
-import android.widget.*;
-import org.sufficientlysecure.donations.google.util.IabHelper;
-import org.sufficientlysecure.donations.google.util.IabResult;
-
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.view.ViewStub;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.webkit.WebView.HitTestResult;
+import android.webkit.WebViewClient;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import android.content.DialogInterface;
-import android.os.Handler;
+import org.sufficientlysecure.donations.google.util.IabHelper;
+import org.sufficientlysecure.donations.google.util.IabResult;
 import org.sufficientlysecure.donations.google.util.Purchase;
 
 public class DonationsFragment extends Fragment {
@@ -293,9 +300,14 @@ public class DonationsFragment extends Fragment {
                     CATALOG_DEBUG[index], IabHelper.ITEM_TYPE_INAPP,
                     0, mPurchaseFinishedListener, null);
         } else {
-            mHelper.launchPurchaseFlow(getActivity(),
-                    mGgoogleCatalog[index], IabHelper.ITEM_TYPE_INAPP,
-                    0, mPurchaseFinishedListener, null);
+            try {
+                mHelper.launchPurchaseFlow(getActivity(),
+                        mGgoogleCatalog[index], IabHelper.ITEM_TYPE_INAPP,
+                        0, mPurchaseFinishedListener, null);
+            } catch (IllegalStateException e) {
+                Toast.makeText(getActivity(), "Возникла проблема, пожалуйста, попробуйте ещё раз", Toast.LENGTH_SHORT).show();
+                getActivity().onBackPressed();
+            }
         }
     }
 
