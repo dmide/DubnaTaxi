@@ -21,3 +21,4 @@ gen
 bin
 debug
 generated
+.gradle

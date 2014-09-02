@@ -1,5 +1,5 @@
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.9'
+    gradleVersion = '1.11'
 }
 
 subprojects{
@@ -11,7 +11,7 @@ subprojects{
             mavenCentral()
         }
         dependencies {
-            classpath 'com.android.tools.build:gradle:0.7.3'
+            classpath 'com.android.tools.build:gradle:0.12.1'
         }
     }
 }
