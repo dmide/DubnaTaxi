@@ -13,3 +13,5 @@ http://careers.stackoverflow.com/dmide
 revdmide@gmail.com
 
 Icons by Alexey Salion
+
+lizardesan@gmail.com
