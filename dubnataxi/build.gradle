@@ -1,32 +1,11 @@
-apply plugin: 'android'
-
 dependencies {
-    compile 'com.android.support:appcompat-v7:19.1.0'
-    compile 'com.android.support:support-v4:19.1.0'
+    compile "com.android.support:appcompat-v7:$support_version"
+    compile "com.android.support:support-v4:$support_version"
+    compile 'com.nineoldandroids:library:2.4.0'
     compile 'com.github.chrisbanes.actionbarpulltorefresh:extra-abc:0.9.2'
-    compile 'com.nhaarman.listviewanimations:library:2.5.2@aar'
+    compile 'com.nhaarman.listviewanimations:lib-core:3.1.0@aar'
+    compile 'com.nhaarman.listviewanimations:lib-manipulation:3.1.0@aar'
+    compile 'com.nhaarman.listviewanimations:lib-core-slh:3.1.0@aar'
     compile project(':Donations')
-}
-
-android {
-    compileSdkVersion 19
-    buildToolsVersion '19.1.0'
-    defaultConfig {
-        minSdkVersion 7
-        targetSdkVersion 19
-    }
-    productFlavors {
-    }
-    buildTypes {
-    }
-}
-
-allprojects {
-    configurations.all {
-        resolutionStrategy {
-            force 'com.android.support:support-v4:19.1.0'
-            force 'com.android.support:appcompat-v7:19.1.0'
-        }
-    }
 }
 

@@ -2,16 +2,46 @@ task wrapper(type: Wrapper) {
     gradleVersion = '1.11'
 }
 
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.12.1'
+    }
+}
+
 subprojects{
     repositories {
         mavenCentral()
     }
+
     buildscript {
         repositories {
             mavenCentral()
         }
         dependencies {
             classpath 'com.android.tools.build:gradle:0.12.1'
+        }
+    }
+
+    apply plugin: project.name.equals("dubnataxi") ? 'com.android.application' : 'com.android.library'
+
+    android {
+        compileSdkVersion 22
+        buildToolsVersion '22.0.1'
+        defaultConfig {
+            minSdkVersion 7
+            targetSdkVersion 22
+        }
+    }
+}
+
+allprojects {
+    configurations.all {
+        resolutionStrategy {
+            force "com.android.support:support-v4:$support_version"
+            force "com.android.support:appcompat-v7:$support_version"
         }
     }
 }
