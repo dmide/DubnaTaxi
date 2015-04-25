@@ -5,7 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.haarman.listviewanimations.ArrayAdapter;
+import com.nhaarman.listviewanimations.ArrayAdapter;
 
 import java.util.ArrayList;
 

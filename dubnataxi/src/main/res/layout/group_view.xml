@@ -2,8 +2,7 @@
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@drawable/selector">
+    android:layout_height="wrap_content">
 
     <TextView
         android:id="@+id/text"
@@ -20,12 +19,13 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_gravity="center_vertical"
+        android:layout_centerVertical="true"
         android:padding="@dimen/drawable_padding"
         android:src="@drawable/ic_action_call" />
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="1px"
+        android:layout_height="1dp"
         android:layout_alignParentBottom="true"
         android:background="@color/border" />
 

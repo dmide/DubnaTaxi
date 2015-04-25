@@ -10,23 +10,19 @@ import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.haarman.listviewanimations.itemmanipulation.OnDismissCallback;
-import com.haarman.listviewanimations.itemmanipulation.SwipeDismissAdapter;
-import com.haarman.listviewanimations.swinginadapters.AnimationAdapter;
-import com.haarman.listviewanimations.swinginadapters.prepared.ScaleInAnimationAdapter;
-
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import com.nhaarman.listviewanimations.appearance.AnimationAdapter;
+import com.nhaarman.listviewanimations.appearance.simple.ScaleInAnimationAdapter;
 
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
+import uk.co.senab.actionbarpulltorefresh.library.DefaultHeaderTransformer;
+import uk.co.senab.actionbarpulltorefresh.library.HeaderTransformer;
+import uk.co.senab.actionbarpulltorefresh.library.Options;
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
@@ -50,6 +46,7 @@ public class MainActivity extends BaseActivity {
         servicesListView.setDivider(null);
 
         pullToRefreshLayout = viewById(R.id.ptr_layout);
+
         ActionBarPullToRefresh.from(this)
                 .allChildrenArePullable()
                 .listener(new OnRefreshListener() {
@@ -59,6 +56,9 @@ public class MainActivity extends BaseActivity {
                     }
                 })
                 .setup(pullToRefreshLayout);
+
+        DefaultHeaderTransformer headerTransformer = (DefaultHeaderTransformer) pullToRefreshLayout.getHeaderTransformer();
+        headerTransformer.setProgressBarColor(getResources().getColor(R.color.orange));
 
         android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
         model = (ModelFragment) fragmentManager.findFragmentByTag(MODEL);

@@ -7,7 +7,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -16,8 +18,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.haarman.listviewanimations.itemmanipulation.OnDismissCallback;
-import com.haarman.listviewanimations.itemmanipulation.SwipeDismissAdapter;
+
+import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.OnDismissCallback;
+import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.SwipeDismissAdapter;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -96,7 +99,7 @@ public class Controller {
         });
         SwipeDismissAdapter dismissAdapter = new SwipeDismissAdapter(model.getPhonesAdapter(), new OnDismissCallback() {
             @Override
-            public void onDismiss(AbsListView absListView, int[] ints) {
+            public void onDismiss(@NonNull ViewGroup viewGroup, @NonNull int[] ints) {
                 deletePhone((String) model.getPhonesAdapter().getItem(ints[0]), groupPos, activity, dialog);
                 buttons.setVisibility(View.VISIBLE);
                 Toast.makeText(activity, R.string.phone_deleted, Toast.LENGTH_SHORT).show();
