@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.view.View;
@@ -80,6 +81,10 @@ public class Controller {
         final Button cancelBtn = viewById(view, R.id.cancel);
         final LinearLayout buttons = viewById(view, R.id.buttons);
         final ListView phonesList = viewById(view, R.id.list);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            View separator = viewById(view, R.id.separator);
+            separator.setVisibility(View.VISIBLE);
+        }
         final AlertDialog dialog = new AlertDialog.Builder(activity)
                 .setTitle(model.currentService)
                 .setView(view)

@@ -1,5 +1,6 @@
 package ru.dmide.dubnataxi;
 
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,6 +40,9 @@ public class PhonesAdapter extends ArrayAdapter {
             convertView = inflater.inflate(R.layout.child_view, null);
         }
         TextView textView = viewById(convertView, R.id.phone_number_tv);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            convertView.setBackgroundColor(convertView.getContext().getResources().getColor(R.color.bg_default));
+        }
         textView.setHeight(listItemHeight);
         String phone = phones.get(position);
         textView.setText(phone);
