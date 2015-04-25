@@ -22,3 +22,4 @@ bin
 debug
 generated
 .gradle
+local.properties
