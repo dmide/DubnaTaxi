@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
@@ -10,14 +9,14 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginTop="17dp"
-        android:visibility="gone"
         android:background="@color/border"/>
 
     <ListView
-        android:id="@+id/list"
+        android:id="@+id/phones_list"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:listSelector="@drawable/selector"/>
+        android:listSelector="@drawable/selector"
+        android:drawSelectorOnTop="true"/>
 
     <LinearLayout
         android:id="@+id/buttons"
@@ -30,23 +29,13 @@
             android:layout_width="0dp"
             android:layout_height="@dimen/dialog_button_height"
             android:layout_weight="1"
-            android:background="@color/bg_item"
-            android:textSize="@dimen/text_size_default"
             android:text="@string/ok" />
-
-        <View
-            android:layout_width="1px"
-            android:layout_height="fill_parent"
-            android:background="@color/border" />
 
         <Button
             android:id="@+id/cancel"
             android:layout_width="0dp"
             android:layout_height="@dimen/dialog_button_height"
             android:layout_weight="1"
-            android:background="@color/bg_item"
-            android:textSize="@dimen/text_size_default"
             android:text="@string/cancel" />
     </LinearLayout>
-
 </LinearLayout>

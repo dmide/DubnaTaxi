@@ -14,25 +14,6 @@ import java.net.URL;
 
 public class WebHelper {
 
-    public static String getPage(URL url) throws Exception {
-        StringBuilder buf;
-        BufferedReader reader = null;
-        int i = 0;
-        try {
-            do {
-                reader = connectAndGetReader(url);
-                buf = new StringBuilder();
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    buf.append(line + "\n");
-                }
-            } while (buf.toString().equals("\n") && (++i < 5)); // trying to receive page 5 times
-        } finally {
-            closeReader(reader, "WebHelper loadPage");
-        }
-        return buf.toString();
-    }
-
     public static void loadContent(URL url, Parser parser, String checkString)
             throws Exception {
         int i = 0;

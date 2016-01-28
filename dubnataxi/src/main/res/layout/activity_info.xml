@@ -5,25 +5,20 @@
 
     <RelativeLayout
         android:id="@+id/content"
+        android:layout_margin="@dimen/activity_margin"
         android:layout_height="wrap_content"
         android:layout_width="match_parent">
 
         <TextView
             style="@style/info_text"
-            android:id="@+id/info1"
-            android:text="@string/info1"
+            android:id="@+id/info"
+            android:text="@string/info"
             android:layout_alignParentTop="true" />
 
         <TextView
             style="@style/info_text"
-            android:id="@+id/info2"
-            android:text="@string/info2"
-            android:layout_below="@id/info1" />
-
-        <TextView
-            style="@style/info_text"
             android:id="@+id/sources"
-            android:layout_below="@id/info2" />
+            android:layout_below="@id/info" />
 
         <TextView
             style="@style/info_text"

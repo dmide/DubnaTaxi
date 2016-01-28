@@ -2,15 +2,16 @@
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="@dimen/list_item_height"
+>
 
     <TextView
         android:id="@+id/text"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="@dimen/list_item_height"
         android:layout_alignParentLeft="true"
         android:gravity="center_vertical"
-        android:paddingLeft="@dimen/list_parent_left_padding"
+        android:paddingLeft="@dimen/service_list_left_padding"
         android:textSize="@dimen/text_size_medium"
         android:textStyle="bold" />
 

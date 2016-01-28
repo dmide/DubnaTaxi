@@ -1,72 +1,87 @@
 package ru.dmide.dubnataxi;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.nhaarman.listviewanimations.appearance.AnimationAdapter;
 import com.nhaarman.listviewanimations.appearance.simple.ScaleInAnimationAdapter;
 
-import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
-import uk.co.senab.actionbarpulltorefresh.library.DefaultHeaderTransformer;
-import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
-import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import ru.dmide.dubnataxi.adapters.ServicesAdapter;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity implements ModelFragment.DataListener {
     public static final String MODEL = "MODEL";
     public static final String TO_RATE_OR_NOT_TO_RATE = "TO_RATE_OR_NOT_TO_RATE";
 
     private ModelFragment model;
     private Controller controller;
-    private ListView servicesListView;
     private SharedPreferences preferences;
-    private PullToRefreshLayout pullToRefreshLayout;
+
+    @Bind(R.id.services_list)
+    ListView servicesListView;
+    @Bind(R.id.swipe_container)
+    SwipeRefreshLayout swipeRefreshLayout;
+    private ServicesAdapter servicesAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        preferences = PreferenceManager.getDefaultSharedPreferences(this);
         setContentView(R.layout.activity_main);
-
-        servicesListView = viewById(R.id.list);
+        ButterKnife.bind(this);
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
         servicesListView.setDivider(null);
+        swipeRefreshLayout.setOnRefreshListener(() -> model.loadContent(false, false));
+        swipeRefreshLayout.setColorSchemeResources(
+                R.color.orange,
+                R.color.dark_grey);
 
-        pullToRefreshLayout = viewById(R.id.ptr_layout);
-
-        ActionBarPullToRefresh.from(this)
-                .allChildrenArePullable()
-                .listener(new OnRefreshListener() {
-                    @Override
-                    public void onRefreshStarted(View view) {
-                        updateContent(false, false);
-                    }
-                })
-                .setup(pullToRefreshLayout);
-
-        DefaultHeaderTransformer headerTransformer = (DefaultHeaderTransformer) pullToRefreshLayout.getHeaderTransformer();
-        headerTransformer.setProgressBarColor(getResources().getColor(R.color.orange));
-
-        android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentManager fragmentManager = getSupportFragmentManager();
         model = (ModelFragment) fragmentManager.findFragmentByTag(MODEL);
         if (model == null) {
             model = new ModelFragment();
             model.setRetainInstance(true);
-            fragmentManager.beginTransaction().add(model, MODEL);
+            fragmentManager.beginTransaction().add(model, MODEL).commit();
+            swipeRefreshLayout.setRefreshing(true);
         }
-        model.init(this);
         controller = new Controller(model);
+        initServicesList();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        model.subscribe(this);
+    }
+
+    @Override
+    protected void onPause() {
+        model.saveUserActions();
+        model.unsubscribe(this);
+        super.onPause();
+    }
+
+    @Override
+    public void onDataSetChanged() {
+        swipeRefreshLayout.setRefreshing(false);
+        servicesAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onDataSetLoading() {
+        swipeRefreshLayout.setRefreshing(true);
     }
 
     @Override
@@ -79,7 +94,7 @@ public class MainActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_clear:
-                updateContent(false, true);
+                model.loadContent(false, true);
                 return true;
             case R.id.info:
                 Intent i = new Intent(this, InfoActivity.class);
@@ -89,7 +104,7 @@ public class MainActivity extends BaseActivity {
                 Uri uri = Uri.parse("geo:");
                 Intent w = new Intent(android.content.Intent.ACTION_VIEW, uri);
                 startActivity(w);
-                Toast.makeText(this, getString(R.string.face),Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.face), Toast.LENGTH_SHORT).show();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -100,26 +115,14 @@ public class MainActivity extends BaseActivity {
         if (preferences.getBoolean(TO_RATE_OR_NOT_TO_RATE, true)) {
             View rateDialog = View.inflate(this, R.layout.rate_dialog, null);
             CheckBox checkBox = viewById(rateDialog, R.id.checkbox);
-            checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    preferences.edit().putBoolean(TO_RATE_OR_NOT_TO_RATE, !isChecked).commit();
-                }
-            });
+            checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> preferences.edit().putBoolean(TO_RATE_OR_NOT_TO_RATE, !isChecked).commit());
             new AlertDialog.Builder(this)
                     .setView(rateDialog)
-                    .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Intent i = new Intent(MainActivity.this, InfoActivity.class);
-                            startActivity(i);
-                        }
+                    .setPositiveButton(getString(R.string.yes), (dialog, which) -> {
+                        startActivity(new Intent(MainActivity.this, InfoActivity.class));
                     })
-                    .setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            finish();
-                        }
+                    .setNegativeButton(getString(R.string.no), (dialog, which) -> {
+                        finish();
                     })
                     .setInverseBackgroundForced(true)
                     .show();
@@ -132,30 +135,15 @@ public class MainActivity extends BaseActivity {
         return preferences;
     }
 
-    void initServicesList(){
-        AnimationAdapter animAdapter = new ScaleInAnimationAdapter(model.getServicesAdapter());
+    private void initServicesList() {
+        servicesAdapter = new ServicesAdapter(this, model);
+        AnimationAdapter animAdapter = new ScaleInAnimationAdapter(servicesAdapter);
         animAdapter.setAbsListView(servicesListView);
         servicesListView.setAdapter(animAdapter);
-
-        servicesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, final int groupPos, long id) {
-                controller.onServiceClick(groupPos, MainActivity.this);
-            }
+        servicesListView.setOnItemClickListener((parent, view, groupPos, id)
+                -> {
+            controller.onServiceClick(servicesAdapter.getItem(groupPos), MainActivity.this);
+            servicesAdapter.notifyDataSetChanged();
         });
-    }
-
-    ModelFragment getModel() {
-        return model;
-    }
-
-    void updateContent(boolean useCache, boolean clear) {
-        if (pullToRefreshLayout != null) {
-            pullToRefreshLayout.setRefreshing(true);
-        }
-        if (clear) {
-            controller.clearDeletedValues();
-        }
-        new ContentLoadTask(this, pullToRefreshLayout, useCache).execute();
     }
 }

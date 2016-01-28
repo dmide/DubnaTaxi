@@ -21,7 +21,7 @@ public class JsonPrefsHelper {
     public static void saveJSONArray(SharedPreferences preferences, String key, JSONArray array) {
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString(JSON_PREFIX + key, array.toString());
-        editor.commit();
+        editor.apply();
     }
 
     public static JSONArray loadJSONArray(SharedPreferences preferences, String key) {

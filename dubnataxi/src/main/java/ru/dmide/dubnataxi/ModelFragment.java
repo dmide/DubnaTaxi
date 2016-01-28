@@ -2,12 +2,21 @@ package ru.dmide.dubnataxi;
 
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.util.Log;
+import android.widget.Toast;
 
 import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -15,100 +24,221 @@ import java.util.Set;
  * Created by drevis on 19.02.14.
  */
 public class ModelFragment extends android.support.v4.app.Fragment {
-    public static final String CALLED_NUMS = "CALLED_NUMS";
-    public static final String DELETED_NUMS = "DELETED_NUMS";
-    public static final String DELETED_SERVICES = "DELETED_SERVICES";
+    private static final String CALLED_NUMS = "CALLED_NUMS";
+    private static final String DELETED_NUMS = "DELETED_NUMS";
+    private static final String DELETED_SERVICES = "DELETED_SERVICES";
 
-    Set<String> calledNumbers = new HashSet<String>();
-    Set<String> deletedNumbers = new HashSet<String>();
-    Set<String> deletedServices = new HashSet<String>();
-    String currentService;
+    private final Set<String> calledPhones = new HashSet<>();
+    private final Set<String> deletedPhoneNumbers = new HashSet<>();
+    private final Set<String> deletedServices = new HashSet<>();
+    private final Map<String, Set<String>> phonesMap = new HashMap<>();
+    private final Map<String, List<String>> serviceToPhonesMap = new LinkedHashMap<>();
+    private final Set<DataListener> dataListeners = new HashSet<>();
 
-    private Map<String, Set<String>> numbersMap = new HashMap<String, Set<String>>();
-    private HashMap<String, ArrayList<String>> taxiNumbersTree;
-    private ServicesAdapter servicesAdapter;
-    private PhonesAdapter phonesAdapter;
-    private MainActivity mainActivity;
+    private String lastSelectedService = "";
+    private String lastCalledNumber = "";
     private SharedPreferences sharedPreferences;
+    private boolean isLoaded;
 
-    public void init(MainActivity mainActivity) {
-        this.mainActivity = mainActivity;
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        MainActivity mainActivity = (MainActivity) getActivity();
         sharedPreferences = mainActivity.getSharedPrefs();
 
-        numbersMap.put(CALLED_NUMS, calledNumbers);
-        numbersMap.put(DELETED_NUMS, deletedNumbers);
-        numbersMap.put(DELETED_SERVICES, deletedServices);
+        phonesMap.put(CALLED_NUMS, calledPhones);
+        phonesMap.put(DELETED_NUMS, deletedPhoneNumbers);
+        phonesMap.put(DELETED_SERVICES, deletedServices);
 
-        servicesAdapter = new ServicesAdapter(mainActivity, this);
-        phonesAdapter = new PhonesAdapter(mainActivity, this);
-        loadSavedActions();
-        mainActivity.updateContent(true, false);
+        loadUserActions();
+        loadContent(true, false);
     }
 
-    public void initContent(HashMap<String, ArrayList<String>> taxiNumbersTree) {
-        this.taxiNumbersTree = taxiNumbersTree;
-        initServicesAdapter();
-    }
-
-    public boolean initPhonesAdapter(int pos) {
-        ArrayList<String> servicesList = new ArrayList<String>(taxiNumbersTree.keySet());
-        currentService = servicesList.get(pos);
-        ArrayList<String> phones = new ArrayList<String>(taxiNumbersTree.get(currentService));
-        phones.removeAll(deletedNumbers);
-        if (phones.isEmpty()) {
-            return false;
+    public void loadContent(boolean useCache, boolean clear) {
+        isLoaded = false;
+        if (clear) {
+            restoreDeletedValues();
         }
-        phonesAdapter.init(phones);
-        return true;
+        new ContentLoadTask(useCache).execute();
     }
 
-    public void initServicesAdapter() {
-        Set<String> services = taxiNumbersTree.keySet();
+    public void subscribe(DataListener dataListener) {
+        dataListeners.add(dataListener);
+        if (isLoaded) {
+            dataListener.onDataSetChanged();
+        }
+    }
+
+    public void unsubscribe(DataListener dataListener) {
+        dataListeners.remove(dataListener);
+    }
+
+    public List<String> getPhonesForService(String serviceId) {
+        ArrayList<String> phones = new ArrayList<>(serviceToPhonesMap.get(serviceId));
+        phones.removeAll(deletedPhoneNumbers);
+        return phones;
+    }
+
+    public List<String> getServices() {
+        List<String> services = new ArrayList<>(serviceToPhonesMap.keySet());
         services.removeAll(deletedServices);
-        servicesAdapter.init(new ArrayList<String>(services));
-        mainActivity.initServicesList();
+        return services;
     }
 
-    public Set<String> getCalledNumbers() {
-        return calledNumbers;
+    public void onPhoneNumberCalled(String number) {
+        lastCalledNumber = number;
+        calledPhones.add(number);
     }
 
-    public MainActivity getMainActivity() {
-        return mainActivity;
+    public String getLastCalledNumber(){
+        return lastCalledNumber;
     }
 
-    ServicesAdapter getServicesAdapter() {
-        return servicesAdapter;
+    public boolean isPhoneNumberCalled(String number) {
+        return calledPhones.contains(number);
     }
 
-    PhonesAdapter getPhonesAdapter() {
-        return phonesAdapter;
+    public void deletePhoneNumber(String phone) {
+        deletedPhoneNumbers.add(phone);
     }
 
-    private void loadSavedActions() {
-        LoadJson(DELETED_SERVICES);
-        LoadJson(DELETED_NUMS);
-        LoadJson(CALLED_NUMS);
+    public void restorePhoneNumber(String number) {
+        deletedPhoneNumbers.remove(number);
     }
 
-    private void LoadJson(String identifier) {
-        Set<String> container = numbersMap.get(identifier);
+    public void deleteService(String service) {
+        deletedServices.add(service);
+        notifyDataSetChanged();
+    }
+
+    public void restoreDeletedValues() {
+        deletedPhoneNumbers.clear();
+        deletedServices.clear();
+    }
+
+    public void saveUserActions() {
+        save(DELETED_SERVICES);
+        save(DELETED_NUMS);
+        save(CALLED_NUMS);
+    }
+
+    public void setLastSelectedService(String service){
+        lastSelectedService = service;
+    }
+
+    public String getLastSelectedService(){
+        return lastSelectedService;
+    }
+
+    private void loadUserActions() {
+        load(DELETED_SERVICES);
+        load(DELETED_NUMS);
+        load(CALLED_NUMS);
+    }
+
+    private void save(String identifier) {
+        Set<String> container = phonesMap.get(identifier);
+        JsonPrefsHelper.saveJSONArray(sharedPreferences, identifier, new JSONArray(container));
+    }
+
+    private void load(String identifier) {
+        Set<String> container = phonesMap.get(identifier);
         JSONArray jsonArray = JsonPrefsHelper.loadJSONArray(sharedPreferences, identifier);
         container.addAll(JsonPrefsHelper.jsonToSet(jsonArray));
     }
 
-    class SaveJsonTask extends AsyncTask<Void, Void, Void> {
-        private String identifier;
+    private void notifyDataSetChanged() {
+        for (DataListener listener : dataListeners) {
+            listener.onDataSetChanged();
+        }
+    }
 
-        SaveJsonTask(String identifier) {
-            this.identifier = identifier;
+    private void notifyDataSetLoading() {
+        for (DataListener listener : dataListeners) {
+            listener.onDataSetLoading();
+        }
+    }
+
+    public interface DataListener {
+        void onDataSetChanged();
+        void onDataSetLoading();
+    }
+
+    private class ContentLoadTask extends AsyncTask<Void, Void, Void> {
+        private static final String CONTENT_URL = "http://dubnataxi.esy.es/";
+        private static final String CONTENT = "content";
+        private final boolean useCache;
+        private final StringBuilder page = new StringBuilder();
+        private Exception e;
+
+        public ContentLoadTask(boolean useCache) {
+            this.useCache = useCache;
+            notifyDataSetLoading();
         }
 
         @Override
         protected Void doInBackground(Void... params) {
-            Set<String> container = numbersMap.get(identifier);
-            JsonPrefsHelper.saveJSONArray(sharedPreferences, identifier, new JSONArray(container));
+            if (useCache) {
+                String pageStr = sharedPreferences.getString(CONTENT, "");
+                if (pageStr.length() != 0) {
+                    page.append(pageStr);
+                    return null;
+                }
+            }
+            try {
+                WebHelper.loadContent(new URL(CONTENT_URL), new PhonesParser(), "");
+            } catch (Exception e) {
+                this.e = e;
+                Log.e(getClass().getSimpleName(),
+                        "Exception retrieving page content", e);
+            }
             return null;
+        }
+
+        @Override
+        public void onPostExecute(Void params) {
+            FragmentActivity activity = getActivity();
+            if (e == null) {
+                String pageStr = page.toString();
+                sharedPreferences.edit().putString(CONTENT, pageStr).apply();
+                try {
+                    JSONObject jsonObject = new JSONObject(pageStr);
+                    String name;
+                    JSONArray serviceList = (JSONArray) jsonObject.get("objects");
+                    serviceToPhonesMap.clear();
+                    for (int i = 0; i < serviceList.length(); i++) {
+                        JSONObject service = (JSONObject) serviceList.get(i);
+                        name = (String) service.get("name");
+                        JSONArray phones = (JSONArray) service.get("numbers");
+                        List<String> phonesList = new ArrayList<>();
+                        for (int j = 0; j < phones.length(); j++) {
+                            phonesList.add((String) phones.get(j));
+                        }
+                        serviceToPhonesMap.put(name, phonesList);
+                    }
+                } catch (JSONException e1) {
+                    showProblemToast(activity);
+                }
+            } else {
+                showProblemToast(activity);
+            }
+            isLoaded = true;
+            notifyDataSetChanged();
+        }
+
+        private void showProblemToast(FragmentActivity activity) {
+            if (activity != null) {
+                Toast.makeText(activity, activity.getString(R.string.problem),
+                        Toast.LENGTH_LONG).show();
+            }
+        }
+
+        private class PhonesParser implements WebHelper.Parser {
+            @Override
+            public void parse(String line) {
+                page.append(line);
+            }
         }
     }
 }
