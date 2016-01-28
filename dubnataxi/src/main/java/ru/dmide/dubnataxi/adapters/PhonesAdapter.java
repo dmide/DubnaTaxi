@@ -17,9 +17,6 @@ import ru.dmide.dubnataxi.R;
 
 import static ru.dmide.dubnataxi.BaseActivity.viewById;
 
-/**
- * Created by dmide on 16/02/14.
- */
 public class PhonesAdapter extends ArrayAdapter {
     private static final int UNSELECTED = 0;
     private static final int SELECTED = 1;
@@ -82,15 +79,5 @@ public class PhonesAdapter extends ArrayAdapter {
     @Override
     public String getItem(int position) {
         return phones.get(position);
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return getItem(position).hashCode();
-    }
-
-    @Override
-    public boolean hasStableIds() {
-        return true;
     }
 }

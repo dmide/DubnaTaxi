@@ -62,14 +62,4 @@ public class ServicesAdapter extends ArrayAdapter {
     public String getItem(int position) {
         return model.getServices().get(position);
     }
-
-    @Override
-    public long getItemId(int position) {
-        return getItem(position).hashCode();
-    }
-
-    @Override
-    public boolean hasStableIds() {
-        return true;
-    }
 }
