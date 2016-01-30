@@ -22,7 +22,7 @@
         android:layout_height="@dimen/list_item_height"
         android:gravity="center_vertical"
         android:layout_toRightOf="@id/called"
-        android:textSize="@dimen/text_size_medium" />
+        android:textSize="@dimen/text_size_big" />
 
     <ImageView
         android:layout_width="wrap_content"

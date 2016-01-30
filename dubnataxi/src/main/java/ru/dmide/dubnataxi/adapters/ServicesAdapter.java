@@ -9,11 +9,11 @@ import android.widget.TextView;
 
 import com.nhaarman.listviewanimations.ArrayAdapter;
 
-import ru.dmide.dubnataxi.MainActivity;
+import ru.dmide.dubnataxi.activity.MainActivity;
 import ru.dmide.dubnataxi.ModelFragment;
 import ru.dmide.dubnataxi.R;
 
-import static ru.dmide.dubnataxi.BaseActivity.viewById;
+import static ru.dmide.dubnataxi.activity.BaseActivity.viewById;
 
 public class ServicesAdapter extends ArrayAdapter {
     private static final int UNSELECTED = 0;

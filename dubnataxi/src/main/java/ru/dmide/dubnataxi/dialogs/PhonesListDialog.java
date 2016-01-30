@@ -83,10 +83,12 @@ public class PhonesListDialog extends AppCompatDialog {
         model.deletePhoneNumber(number);
         phonesAdapter.notifyDataSetChanged();
 
-        boolean isEmpty = model.getPhonesForService(serviceId).isEmpty();
-        if (!isEmpty) {
-            return;
+        if (model.getPhonesForService(serviceId).isEmpty()) {
+            promptServiceRemoval();
         }
+    }
+
+    private void promptServiceRemoval() {
         new AlertDialog.Builder(getContext())
                 .setTitle(R.string.delete_service)
                 .setNegativeButton(R.string.no, (dialog, which) -> {

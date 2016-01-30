@@ -3,6 +3,7 @@ package ru.dmide.dubnataxi;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.widget.Toast;
@@ -20,10 +21,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import ru.dmide.dubnataxi.activity.MainActivity;
+
 /**
  * Created by drevis on 19.02.14.
  */
 public class ModelFragment extends android.support.v4.app.Fragment {
+    private static final String TO_RATE_OR_NOT_TO_RATE = "TO_RATE_OR_NOT_TO_RATE";
     private static final String CALLED_NUMS = "CALLED_NUMS";
     private static final String DELETED_NUMS = "DELETED_NUMS";
     private static final String DELETED_SERVICES = "DELETED_SERVICES";
@@ -35,17 +39,16 @@ public class ModelFragment extends android.support.v4.app.Fragment {
     private final Map<String, List<String>> serviceToPhonesMap = new LinkedHashMap<>();
     private final Set<DataListener> dataListeners = new HashSet<>();
 
+    private SharedPreferences preferences;
     private String lastSelectedService = "";
     private String lastCalledNumber = "";
-    private SharedPreferences sharedPreferences;
     private boolean isLoaded;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        MainActivity mainActivity = (MainActivity) getActivity();
-        sharedPreferences = mainActivity.getSharedPrefs();
+        preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
         phonesMap.put(CALLED_NUMS, calledPhones);
         phonesMap.put(DELETED_NUMS, deletedPhoneNumbers);
@@ -53,6 +56,10 @@ public class ModelFragment extends android.support.v4.app.Fragment {
 
         loadUserActions();
         loadContent(true, false);
+    }
+
+    public SharedPreferences getSharedPrefs() {
+        return preferences;
     }
 
     public void loadContent(boolean useCache, boolean clear) {
@@ -131,6 +138,14 @@ public class ModelFragment extends android.support.v4.app.Fragment {
         return lastSelectedService;
     }
 
+    public boolean isShouldShowRateDialog(){
+        return preferences.getBoolean(ModelFragment.TO_RATE_OR_NOT_TO_RATE, true);
+    }
+
+    public void setShouldShowRateDialog(boolean value){
+        preferences.edit().putBoolean(ModelFragment.TO_RATE_OR_NOT_TO_RATE, value).apply();
+    }
+
     private void loadUserActions() {
         load(DELETED_SERVICES);
         load(DELETED_NUMS);
@@ -139,12 +154,12 @@ public class ModelFragment extends android.support.v4.app.Fragment {
 
     private void save(String identifier) {
         Set<String> container = phonesMap.get(identifier);
-        JsonPrefsHelper.saveJSONArray(sharedPreferences, identifier, new JSONArray(container));
+        JsonPrefsHelper.saveJSONArray(preferences, identifier, new JSONArray(container));
     }
 
     private void load(String identifier) {
         Set<String> container = phonesMap.get(identifier);
-        JSONArray jsonArray = JsonPrefsHelper.loadJSONArray(sharedPreferences, identifier);
+        JSONArray jsonArray = JsonPrefsHelper.loadJSONArray(preferences, identifier);
         container.addAll(JsonPrefsHelper.jsonToSet(jsonArray));
     }
 
@@ -180,7 +195,7 @@ public class ModelFragment extends android.support.v4.app.Fragment {
         @Override
         protected Void doInBackground(Void... params) {
             if (useCache) {
-                String pageStr = sharedPreferences.getString(CONTENT, "");
+                String pageStr = preferences.getString(CONTENT, "");
                 if (pageStr.length() != 0) {
                     page.append(pageStr);
                     return null;
@@ -201,7 +216,7 @@ public class ModelFragment extends android.support.v4.app.Fragment {
             FragmentActivity activity = getActivity();
             if (e == null) {
                 String pageStr = page.toString();
-                sharedPreferences.edit().putString(CONTENT, pageStr).apply();
+                preferences.edit().putString(CONTENT, pageStr).apply();
                 try {
                     JSONObject jsonObject = new JSONObject(pageStr);
                     String name;

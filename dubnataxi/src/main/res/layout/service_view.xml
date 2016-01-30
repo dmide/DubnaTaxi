@@ -12,7 +12,7 @@
         android:layout_alignParentLeft="true"
         android:gravity="center_vertical"
         android:paddingLeft="@dimen/service_list_left_padding"
-        android:textSize="@dimen/text_size_medium"
+        android:textSize="@dimen/text_size_big"
         android:textStyle="bold" />
 
     <ImageView

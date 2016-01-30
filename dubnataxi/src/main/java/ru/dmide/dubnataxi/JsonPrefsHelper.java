@@ -35,15 +35,15 @@ public class JsonPrefsHelper {
 
     public static Set<String> jsonToSet(JSONArray jsonArray) {
         if (jsonArray != null) {
-            Set<String> listdata = new HashSet<String>();
+            Set<String> result = new HashSet<String>();
             try {
                 for (int i = 0; i < jsonArray.length(); i++) {
-                    listdata.add((String) jsonArray.get(i));
+                    result.add((String) jsonArray.get(i));
                 }
             } catch (JSONException e) {
                 Log.e(ModelFragment.class.getSimpleName(), "error parsing JSON", e);
             }
-            return listdata;
+            return result;
         }
         return Collections.emptySet();
     }
@@ -52,7 +52,7 @@ public class JsonPrefsHelper {
         if (preferences.contains(JSON_PREFIX + key)) {
             SharedPreferences.Editor editor = preferences.edit();
             editor.remove(JSON_PREFIX + key);
-            editor.commit();
+            editor.apply();
         }
     }
 }

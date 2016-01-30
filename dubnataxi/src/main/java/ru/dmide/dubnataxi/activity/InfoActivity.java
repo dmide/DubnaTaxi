@@ -1,9 +1,8 @@
-package ru.dmide.dubnataxi;
+package ru.dmide.dubnataxi.activity;
 
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.view.MenuItem;
@@ -11,8 +10,11 @@ import android.widget.TextView;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import ru.dmide.dubnataxi.R;
 
 public class InfoActivity extends BaseActivity {
+    public static final int REQUEST_CODE = 1337;
+    public static final int RESULT_CODE_RATED = 1;
 
     @Bind(R.id.mail_to)
     TextView mailTo;
@@ -37,14 +39,14 @@ public class InfoActivity extends BaseActivity {
         sources.setMovementMethod(LinkMovementMethod.getInstance());
 
         rateBtn.setOnClickListener(v -> {
-            saveHasBeenRated();
+            setResult(RESULT_CODE_RATED);
             Uri uri = Uri.parse(getString(R.string.google_play_link));
             Intent intent = new Intent(Intent.ACTION_VIEW, uri);
             startActivity(intent);
         });
 
         donateBtn.setOnClickListener(v -> {
-            saveHasBeenRated();
+            setResult(RESULT_CODE_RATED);
             Intent i = new Intent(InfoActivity.this, DonateActivity.class);
             startActivity(i);
         });
@@ -57,12 +59,5 @@ public class InfoActivity extends BaseActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    private void saveHasBeenRated() {
-        PreferenceManager.getDefaultSharedPreferences(this)
-                .edit()
-                .putBoolean(MainActivity.TO_RATE_OR_NOT_TO_RATE, false)
-                .commit();
     }
 }

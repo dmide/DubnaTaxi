@@ -15,7 +15,7 @@ import java.util.List;
 import ru.dmide.dubnataxi.ModelFragment;
 import ru.dmide.dubnataxi.R;
 
-import static ru.dmide.dubnataxi.BaseActivity.viewById;
+import static ru.dmide.dubnataxi.activity.BaseActivity.viewById;
 
 public class PhonesAdapter extends ArrayAdapter {
     private static final int UNSELECTED = 0;
