@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">DubnaTaxi</string>
+    <string name="content_url">http://dubnataxi.esy.es/</string>
     <string name="action_clear">Восстановить список</string>
     <string name="action_where">Где я?</string>
     <string name="face">\u0CA0__\u0CA0</string>

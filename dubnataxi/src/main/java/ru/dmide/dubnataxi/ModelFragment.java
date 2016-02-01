@@ -1,7 +1,6 @@
 package ru.dmide.dubnataxi;
 
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
@@ -9,10 +8,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,7 +17,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import ru.dmide.dubnataxi.activity.MainActivity;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.GsonConverterFactory;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import ru.dmide.dubnataxi.web.Service;
+import ru.dmide.dubnataxi.web.ServicesListResponse;
+import ru.dmide.dubnataxi.web.WebAPI;
 
 /**
  * Created by drevis on 19.02.14.
@@ -39,6 +42,7 @@ public class ModelFragment extends android.support.v4.app.Fragment {
     private final Map<String, List<String>> serviceToPhonesMap = new LinkedHashMap<>();
     private final Set<DataListener> dataListeners = new HashSet<>();
 
+    private String contentUrl;
     private SharedPreferences preferences;
     private String lastSelectedService = "";
     private String lastCalledNumber = "";
@@ -47,7 +51,7 @@ public class ModelFragment extends android.support.v4.app.Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        contentUrl = getString(R.string.content_url);
         preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
         phonesMap.put(CALLED_NUMS, calledPhones);
@@ -67,7 +71,7 @@ public class ModelFragment extends android.support.v4.app.Fragment {
         if (clear) {
             restoreDeletedValues();
         }
-        new ContentLoadTask(useCache).execute();
+        loadContent();
     }
 
     public void subscribe(DataListener dataListener) {
@@ -98,7 +102,7 @@ public class ModelFragment extends android.support.v4.app.Fragment {
         calledPhones.add(number);
     }
 
-    public String getLastCalledNumber(){
+    public String getLastCalledNumber() {
         return lastCalledNumber;
     }
 
@@ -130,19 +134,19 @@ public class ModelFragment extends android.support.v4.app.Fragment {
         save(CALLED_NUMS);
     }
 
-    public void setLastSelectedService(String service){
+    public void setLastSelectedService(String service) {
         lastSelectedService = service;
     }
 
-    public String getLastSelectedService(){
+    public String getLastSelectedService() {
         return lastSelectedService;
     }
 
-    public boolean isShouldShowRateDialog(){
+    public boolean isShouldShowRateDialog() {
         return preferences.getBoolean(ModelFragment.TO_RATE_OR_NOT_TO_RATE, true);
     }
 
-    public void setShouldShowRateDialog(boolean value){
+    public void setShouldShowRateDialog(boolean value) {
         preferences.edit().putBoolean(ModelFragment.TO_RATE_OR_NOT_TO_RATE, value).apply();
     }
 
@@ -177,83 +181,41 @@ public class ModelFragment extends android.support.v4.app.Fragment {
 
     public interface DataListener {
         void onDataSetChanged();
+
         void onDataSetLoading();
     }
 
-    private class ContentLoadTask extends AsyncTask<Void, Void, Void> {
-        private static final String CONTENT_URL = "http://dubnataxi.esy.es/";
-        private static final String CONTENT = "content";
-        private final boolean useCache;
-        private final StringBuilder page = new StringBuilder();
-        private Exception e;
-
-        public ContentLoadTask(boolean useCache) {
-            this.useCache = useCache;
-            notifyDataSetLoading();
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            if (useCache) {
-                String pageStr = preferences.getString(CONTENT, "");
-                if (pageStr.length() != 0) {
-                    page.append(pageStr);
-                    return null;
-                }
-            }
-            try {
-                WebHelper.loadContent(new URL(CONTENT_URL), new PhonesParser(), "");
-            } catch (Exception e) {
-                this.e = e;
-                Log.e(getClass().getSimpleName(),
-                        "Exception retrieving page content", e);
-            }
-            return null;
-        }
-
-        @Override
-        public void onPostExecute(Void params) {
-            FragmentActivity activity = getActivity();
-            if (e == null) {
-                String pageStr = page.toString();
-                preferences.edit().putString(CONTENT, pageStr).apply();
-                try {
-                    JSONObject jsonObject = new JSONObject(pageStr);
-                    String name;
-                    JSONArray serviceList = (JSONArray) jsonObject.get("objects");
-                    serviceToPhonesMap.clear();
-                    for (int i = 0; i < serviceList.length(); i++) {
-                        JSONObject service = (JSONObject) serviceList.get(i);
-                        name = (String) service.get("name");
-                        JSONArray phones = (JSONArray) service.get("numbers");
-                        List<String> phonesList = new ArrayList<>();
-                        for (int j = 0; j < phones.length(); j++) {
-                            phonesList.add((String) phones.get(j));
-                        }
-                        serviceToPhonesMap.put(name, phonesList);
-                    }
-                } catch (JSONException e1) {
-                    showProblemToast(activity);
-                }
-            } else {
-                showProblemToast(activity);
-            }
-            isLoaded = true;
-            notifyDataSetChanged();
-        }
-
-        private void showProblemToast(FragmentActivity activity) {
-            if (activity != null) {
-                Toast.makeText(activity, activity.getString(R.string.problem),
-                        Toast.LENGTH_LONG).show();
-            }
-        }
-
-        private class PhonesParser implements WebHelper.Parser {
+    private void loadContent() {
+        notifyDataSetLoading();
+        Retrofit retrofit = new Retrofit.Builder()
+                .addConverterFactory(GsonConverterFactory.create())
+                .baseUrl(contentUrl)
+                .build();
+        WebAPI api = retrofit.create(WebAPI.class);
+        Call<ServicesListResponse> listCall = api.getServices();
+        listCall.enqueue(new Callback<ServicesListResponse>() {
             @Override
-            public void parse(String line) {
-                page.append(line);
+            public void onResponse(Response<ServicesListResponse> response) {
+                serviceToPhonesMap.clear();
+                for (Service service : response.body().getServiceList()) {
+                    serviceToPhonesMap.put(service.getName(), service.getNumbers());
+                }
+                isLoaded = true;
+                notifyDataSetChanged();
             }
+
+            @Override
+            public void onFailure(Throwable t) {
+                Log.e(ModelFragment.class.getSimpleName(), "Failed to load the content.", t);
+                showProblemToast(getActivity());
+            }
+        });
+    }
+
+    private void showProblemToast(FragmentActivity activity) {
+        if (activity != null) {
+            Toast.makeText(activity, activity.getString(R.string.problem),
+                    Toast.LENGTH_LONG).show();
         }
     }
 }
