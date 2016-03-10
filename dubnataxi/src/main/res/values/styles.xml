@@ -8,7 +8,8 @@
         <item name="android:textColor">@color/dark_grey</item>
     </style>
 
-    <style name="ServicesDialogStyle" parent="Theme.AppCompat.Light.Dialog">
+    <style name="ServicesDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="windowNoTitle">false</item>
         <item name="colorAccent">@color/orange</item>
         <item name="android:background">@color/bg_default</item>
     </style>

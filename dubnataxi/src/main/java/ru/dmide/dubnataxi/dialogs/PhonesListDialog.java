@@ -1,11 +1,10 @@
 package ru.dmide.dubnataxi.dialogs;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.os.Bundle;
-import android.support.v7.app.AppCompatDialog;
+import android.content.DialogInterface;
+import android.support.v7.app.AlertDialog;
 import android.view.View;
-import android.widget.LinearLayout;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -14,49 +13,61 @@ import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.SwipeDismis
 import java.util.HashSet;
 import java.util.Set;
 
-import butterknife.Bind;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 import ru.dmide.dubnataxi.Controller;
 import ru.dmide.dubnataxi.ModelFragment;
-import ru.dmide.dubnataxi.adapters.PhonesAdapter;
 import ru.dmide.dubnataxi.R;
+import ru.dmide.dubnataxi.adapters.PhonesAdapter;
 
 /**
  * Created by dmide on 24/01/2016.
  */
-public class PhonesListDialog extends AppCompatDialog {
+public class PhonesListDialog {
 
-    @Bind(R.id.buttons)
-    LinearLayout buttons;
-    @Bind(R.id.phones_list)
-    ListView phonesList;
-
+    private final Context context;
     private final ModelFragment model;
     private final Controller controller;
     private final String serviceId;
     private final Set<String> phonesToDelete = new HashSet<>();
-    private PhonesAdapter phonesAdapter;
+    private final AlertDialog.Builder builder;
+    private final PhonesAdapter phonesAdapter;
+
+    private AlertDialog dialog;
+    private Button okButton, cancelButton;
 
     public PhonesListDialog(Context context, ModelFragment model, Controller controller, String serviceId) {
-        super(context, R.style.ServicesDialogStyle);
-        this.model = model;
+        this.context = context;
         this.controller = controller;
+        this.model = model;
         this.serviceId = serviceId;
+        builder = new AlertDialog.Builder(context, R.style.ServicesDialogStyle)
+                .setTitle(serviceId)
+                .setPositiveButton(R.string.ok, (dialog1, which) -> {
+                    dialog.dismiss();
+                })
+                .setNegativeButton(R.string.cancel, (dialog2, which1) -> {
+                    restoreDeleted();
+                    dialog.dismiss();
+                })
+                .setView(R.layout.phones_dialog_view)
+                .setOnDismissListener(dialog3 -> restoreDeleted());
+        phonesAdapter = new PhonesAdapter(model, serviceId);
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.phones_dialog_view);
-        ButterKnife.bind(this);
+    public void show() {
+        dialog = builder.show();
 
-        phonesAdapter = new PhonesAdapter(model, serviceId);
+        okButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
+        okButton.setVisibility(View.GONE);
+        cancelButton = dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+        cancelButton.setVisibility(View.GONE);
+
+        ListView phonesList = (ListView) dialog.findViewById(R.id.phones_list);
 
         SwipeDismissAdapter dismissAdapter = new SwipeDismissAdapter(phonesAdapter, (viewGroup, ints) -> {
             deletePhone(phonesAdapter.getItem(ints[0]));
-            buttons.setVisibility(View.VISIBLE);
-            Toast.makeText(getContext().getApplicationContext(), R.string.phone_deleted, Toast.LENGTH_SHORT).show();
+            okButton.setVisibility(View.VISIBLE);
+            cancelButton.setVisibility(View.VISIBLE);
+            Toast.makeText(context.getApplicationContext(), R.string.phone_deleted, Toast.LENGTH_SHORT).show();
         });
         dismissAdapter.setAbsListView(phonesList);
         phonesList.setAdapter(dismissAdapter);
@@ -65,17 +76,6 @@ public class PhonesListDialog extends AppCompatDialog {
             controller.onPhoneNumberClick(phonesAdapter.getItem(position));
             phonesAdapter.notifyDataSetChanged();
         });
-    }
-
-    @OnClick(R.id.ok)
-    public void ok() {
-        dismiss();
-    }
-
-    @OnClick(R.id.cancel)
-    public void cancel() {
-        restoreDeleted();
-        dismiss();
     }
 
     private void deletePhone(String number) {
@@ -89,20 +89,14 @@ public class PhonesListDialog extends AppCompatDialog {
     }
 
     private void promptServiceRemoval() {
-        new AlertDialog.Builder(getContext())
-                .setTitle(R.string.delete_service)
-                .setNegativeButton(R.string.no, (dialog, which) -> {
-                    restoreDeleted();
-                })
-                .setPositiveButton(R.string.yes, (dialog, which) -> {
-                    model.deleteService(serviceId);
-                })
-                .show();
-        dismiss();
+        dialog.findViewById(R.id.prompt).setVisibility(View.VISIBLE);
+        okButton.setOnClickListener(v -> {
+            model.deleteService(serviceId);
+        });
     }
 
     private void restoreDeleted() {
-        for (String phone: phonesToDelete){
+        for (String phone : phonesToDelete) {
             model.restorePhoneNumber(phone);
         }
         phonesAdapter.notifyDataSetChanged();

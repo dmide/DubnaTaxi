@@ -30,7 +30,6 @@ public class Controller {
 
     public void onServiceClick(String serviceId, final MainActivity activity) {
         PhonesListDialog phonesListDialog = new PhonesListDialog(activity, model, this, serviceId);
-        phonesListDialog.setTitle(serviceId);
         phonesListDialog.show();
         model.setLastSelectedService(serviceId);
         if (model.getSharedPrefs().getBoolean(SHOULD_SHOW_PHONES_DELETION_TIP, true)) {
