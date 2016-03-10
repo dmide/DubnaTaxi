@@ -5,7 +5,7 @@
     <color name="bg_selected">#77e0dce1</color>
     <color name="bg_item">#ffe9e5ea</color>
     <color name="orange_transparent">#99ffb300</color>
-    <color name="orange">#ffffb300</color>
+    <color name="orange">#ffa200</color>
     <color name="dark_grey">#2b2b2b</color>
     <color name="black">#000000</color>
 </resources>
