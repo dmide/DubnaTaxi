@@ -19,7 +19,7 @@
         android:id="@+id/prompt"
         android:layout_width="match_parent"
         android:layout_height="@dimen/list_item_height"
-        android:textSize="@dimen/text_size_big"
+        android:textSize="@dimen/text_size_medium"
         android:gravity="center_vertical"
         android:text="@string/delete_service"
         android:layout_marginLeft="32dp"
@@ -29,6 +29,5 @@
         android:id="@+id/phones_list"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:drawSelectorOnTop="true"
-        android:listSelector="@drawable/selector" />
+        style="@style/ListViewStyle"/>
 </LinearLayout>

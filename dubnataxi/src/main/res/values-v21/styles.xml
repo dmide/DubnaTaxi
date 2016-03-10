@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="ListViewStyle">
+        <!-- we don't need no selector here because we're using default Material ripple with custom colorControlHighlight color-->
+    </style>
+
+</resources>
