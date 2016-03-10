@@ -92,6 +92,7 @@ public class PhonesListDialog {
         dialog.findViewById(R.id.prompt).setVisibility(View.VISIBLE);
         okButton.setOnClickListener(v -> {
             model.deleteService(serviceId);
+            dialog.dismiss();
         });
     }
 
