@@ -31,6 +31,7 @@
         android:layout_gravity="center_vertical"
         android:layout_centerVertical="true"
         android:padding="@dimen/drawable_padding"
+        android:alpha="0.7"
         android:src="@drawable/ic_action_call" />
 
 </RelativeLayout>
