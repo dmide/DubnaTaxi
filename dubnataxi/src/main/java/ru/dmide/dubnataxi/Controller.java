@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.ViewCompat;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ListView;
@@ -87,6 +88,10 @@ public class Controller {
                 viewById(serviceView, R.id.separator).setVisibility(View.GONE);
             }
         });
+        ViewCompat.animate(viewById(serviceView, R.id.arrow))
+                .rotationBy(-90)
+                .setDuration(200)
+                .start();
     }
 
     private void showPhones(final View serviceView, String serviceId) {
@@ -118,5 +123,9 @@ public class Controller {
         int phonesCount = phonesAdapter.getCount();
         int height = ViewHelper.calcListViewHeight(serviceView.getContext(), phonesCount);
         ViewHelper.expand(phonesList, 200, height);
+        ViewCompat.animate(viewById(serviceView, R.id.arrow))
+                .rotationBy(90)
+                .setDuration(200)
+                .start();
     }
 }

@@ -17,13 +17,14 @@
         android:textStyle="bold" />
 
     <ImageView
-        android:layout_width="wrap_content"
+        android:id="@+id/arrow"
+        android:layout_width="50dp"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:layout_gravity="center_vertical"
         android:padding="@dimen/drawable_padding"
-        android:src="@drawable/ic_action_call" />
+        android:src="@drawable/ic_arrow_right" />
 
     <View
         android:id="@+id/separator"
