@@ -5,7 +5,7 @@
     <string name="action_clear">Восстановить список</string>
     <string name="action_where">Где я?</string>
     <string name="face">\u0CA0__\u0CA0</string>
-    <string name="problem">Не удается получить данные, проблемы с соединением. Попробуйте повторить действие.</string>
+    <string name="problem">Не удается получить данные, проблемы с соединением.</string>
     <string name="ok">OK</string>
     <string name="cancel">Отмена</string>
     <string name="yes">Да</string>

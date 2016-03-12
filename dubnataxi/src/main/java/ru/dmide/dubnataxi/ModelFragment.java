@@ -3,9 +3,10 @@ package ru.dmide.dubnataxi;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
-import android.widget.Toast;
+import android.view.View;
 
 import org.json.JSONArray;
 
@@ -211,15 +212,18 @@ public class ModelFragment extends android.support.v4.app.Fragment {
             @Override
             public void onFailure(Throwable t) {
                 Log.e(ModelFragment.class.getSimpleName(), "Failed to load the content.", t);
-                showProblemToast(getActivity());
+                FragmentActivity activity = getActivity();
+                if (activity != null) {
+                    showProblemSnack(activity.findViewById(android.R.id.content));
+                }
             }
         });
     }
 
-    private void showProblemToast(FragmentActivity activity) {
-        if (activity != null) {
-            Toast.makeText(activity, activity.getString(R.string.problem),
-                    Toast.LENGTH_LONG).show();
+    private void showProblemSnack(View rootview) {
+        if (rootview != null) {
+            ViewHelper.makeStyledSnack(rootview, rootview.getContext().getString(R.string.problem),
+                    Snackbar.LENGTH_LONG).show();
         }
     }
 }
