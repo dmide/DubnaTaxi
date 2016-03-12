@@ -2,14 +2,15 @@
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/list_item_height"
->
+    android:descendantFocusability="blocksDescendants"
+    android:layout_height="@dimen/list_item_height">
 
     <TextView
         android:id="@+id/text"
         android:layout_width="match_parent"
         android:layout_height="@dimen/list_item_height"
         android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
         android:gravity="center_vertical"
         android:paddingLeft="@dimen/service_list_left_padding"
         android:textSize="@dimen/text_size_big"
@@ -19,14 +20,34 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
         android:layout_gravity="center_vertical"
-        android:layout_centerVertical="true"
         android:padding="@dimen/drawable_padding"
         android:src="@drawable/ic_action_call" />
 
     <View
+        android:id="@+id/separator"
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="1dp"
+        android:layout_below="@id/text"
+        android:background="@color/border" />
+
+    <ListView
+        android:id="@+id/phones_list"
+        android:visibility="gone"
+        android:layout_below="@id/separator"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/bg_default"
+        style="@style/ListViewStyle"
+        />
+
+    <View
+        android:id="@+id/bottom_separator"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@id/phones_list"
         android:layout_alignParentBottom="true"
         android:background="@color/border" />
 

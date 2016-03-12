@@ -10,7 +10,6 @@
     <string name="cancel">Отмена</string>
     <string name="yes">Да</string>
     <string name="no">Нет</string>
-    <string name="delete_service">Удалить данную службу?</string>
     <string name="phone_deleted">Телефон удален.</string>
     <string name="phone_deletion_desc">Чтобы удалить телефон, потяните его в сторону.</string>
 

@@ -3,7 +3,7 @@
     <dimen name="default_margin">16dp</dimen>
     <dimen name="list_item_height">55dp</dimen>
     <dimen name="service_list_left_padding">20dp</dimen>
-    <dimen name="drawable_padding">10dp</dimen>
+    <dimen name="drawable_padding">11dp</dimen>
     <dimen name="called_drawable_paddingtop">20dp</dimen>
     <dimen name="info_text_padding">5dp</dimen>
     <dimen name="info_btn_padding">8dp</dimen>

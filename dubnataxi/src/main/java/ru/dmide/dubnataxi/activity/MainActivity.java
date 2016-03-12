@@ -108,7 +108,7 @@ public class MainActivity extends BaseActivity implements ModelFragment.DataList
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == InfoActivity.REQUEST_CODE && resultCode == InfoActivity.RESULT_CODE_RATED){
+        if (requestCode == InfoActivity.REQUEST_CODE && resultCode == InfoActivity.RESULT_CODE_RATED) {
             model.setShouldShowRateDialog(false);
         }
         super.onActivityResult(requestCode, resultCode, data);
@@ -128,14 +128,15 @@ public class MainActivity extends BaseActivity implements ModelFragment.DataList
 
     private void initServicesListView() {
         servicesListView.setDivider(null);
+
         servicesAdapter = new ServicesAdapter(this, model);
         AnimationAdapter animAdapter = new ScaleInAnimationAdapter(servicesAdapter);
         animAdapter.setAbsListView(servicesListView);
         servicesListView.setAdapter(animAdapter);
-        servicesListView.setOnItemClickListener((parent, view, groupPos, id)
-                -> {
-            controller.onServiceClick(servicesAdapter.getItem(groupPos), MainActivity.this);
-            servicesAdapter.notifyDataSetChanged();
+
+        servicesListView.setOnItemClickListener((parent, view, groupPos, id) -> {
+            String serviceId = servicesAdapter.getItem(groupPos);
+            controller.onServiceClick(view, serviceId);
         });
     }
 }

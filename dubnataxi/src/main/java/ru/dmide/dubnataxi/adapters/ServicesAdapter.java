@@ -35,10 +35,13 @@ public class ServicesAdapter extends ArrayAdapter {
         TextView textView = viewById(convertView, R.id.text);
         textView.setText(model.getServices().get(position));
         if (getItemViewType(position) == SELECTED) {
-            convertView.setBackgroundResource(R.drawable.selected_state);
+            viewById(convertView, R.id.phones_list).setVisibility(View.VISIBLE);
+            viewById(convertView, R.id.separator).setVisibility(View.VISIBLE);
         } else {
-            convertView.setBackgroundResource(R.drawable.default_state);
+            viewById(convertView, R.id.phones_list).setVisibility(View.GONE);
+            viewById(convertView, R.id.separator).setVisibility(View.GONE);
         }
+
         return convertView;
     }
 
@@ -54,7 +57,7 @@ public class ServicesAdapter extends ArrayAdapter {
 
     @Override
     public int getItemViewType(int position) {
-        return model.getLastSelectedService().equals(getItem(position)) ? SELECTED : UNSELECTED;
+        return model.isServiceSelected(getItem(position)) ? SELECTED : UNSELECTED;
     }
 
     @NonNull

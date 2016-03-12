@@ -44,7 +44,7 @@ public class ModelFragment extends android.support.v4.app.Fragment {
 
     private String contentUrl;
     private SharedPreferences preferences;
-    private String lastSelectedService = "";
+    private List<String> selectedServices = new ArrayList<>();
     private String lastCalledNumber = "";
     private boolean isLoaded;
 
@@ -134,12 +134,16 @@ public class ModelFragment extends android.support.v4.app.Fragment {
         save(CALLED_NUMS);
     }
 
-    public void setLastSelectedService(String service) {
-        lastSelectedService = service;
+    public void addSelectedService(String service) {
+        selectedServices.add(service);
     }
 
-    public String getLastSelectedService() {
-        return lastSelectedService;
+    public void removeSelectedService(String service) {
+        selectedServices.remove(service);
+    }
+
+    public boolean isServiceSelected(String id) {
+        return selectedServices.contains(id);
     }
 
     public boolean isShouldShowRateDialog() {
