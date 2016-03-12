@@ -14,6 +14,7 @@
         android:gravity="center_vertical"
         android:paddingLeft="@dimen/service_list_left_padding"
         android:textSize="@dimen/text_size_big"
+        android:background="@drawable/selector"
         android:textStyle="bold" />
 
     <ImageView
@@ -24,33 +25,43 @@
         android:layout_alignParentTop="true"
         android:layout_gravity="center_vertical"
         android:padding="@dimen/drawable_padding"
+        android:alpha="0.7"
         android:src="@drawable/ic_arrow_right" />
-
-    <View
-        android:id="@+id/separator"
-        android:visibility="gone"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_below="@id/text"
-        android:background="@color/border" />
-
-    <ListView
-        android:id="@+id/phones_list"
-        android:visibility="gone"
-        android:layout_below="@id/separator"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/bg_default"
-        style="@style/ListViewStyle"
-        />
 
     <View
         android:id="@+id/bottom_separator"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_below="@id/phones_list"
+        android:layout_below="@id/text"
         android:layout_alignParentBottom="true"
-        android:background="@color/border" />
+        android:background="@drawable/shadow_down" />
+
+    <ListView
+        android:id="@+id/phones_list"
+        android:visibility="gone"
+        android:layout_below="@id/bottom_separator"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/bg_dimmed"
+        android:scrollbars="none"
+        style="@style/ListViewStyle"
+        />
+
+    <View
+        android:id="@+id/shadow_down"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/shadow_height"
+        android:layout_alignTop="@id/phones_list"
+        android:background="@drawable/shadow_down" />
+
+    <View
+        android:id="@+id/shadow_up"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/shadow_height"
+        android:layout_alignBottom="@id/phones_list"
+        android:background="@drawable/shadow_up" />
 
 </RelativeLayout>
 

@@ -5,7 +5,6 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
-import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +19,7 @@ import com.nineoldandroids.animation.ValueAnimator;
  */
 public class ViewHelper {
 
-    public static ValueAnimator expand(final View v, int duration, int targetHeight) {
+    public static ValueAnimator getExpandAnimator(final View v, int duration, int targetHeight) {
         ViewGroup.LayoutParams lp = v.getLayoutParams();
         lp.height = 0;
         v.setVisibility(View.VISIBLE);
@@ -31,11 +30,10 @@ public class ViewHelper {
         });
         valueAnimator.setInterpolator(new AccelerateInterpolator());
         valueAnimator.setDuration(duration);
-        valueAnimator.start();
         return valueAnimator;
     }
 
-    public static ValueAnimator collapse(final View v, int duration) {
+    public static ValueAnimator getCollapseAnimator(final View v, int duration) {
         final ViewGroup.LayoutParams lp = v.getLayoutParams();
         final int initialHeight = lp.height;
         ValueAnimator valueAnimator = ValueAnimator.ofInt(initialHeight, 0);
@@ -52,7 +50,6 @@ public class ViewHelper {
         });
         valueAnimator.setInterpolator(new AccelerateInterpolator());
         valueAnimator.setDuration(duration);
-        valueAnimator.start();
         return valueAnimator;
     }
 
@@ -76,15 +73,15 @@ public class ViewHelper {
 
     public static abstract class AnimationEndListener implements Animator.AnimatorListener {
         @Override
-        public void onAnimationStart(Animator animation) {
-        }
-
-        @Override
         public void onAnimationCancel(Animator animation) {
         }
 
         @Override
         public void onAnimationRepeat(Animator animation) {
+        }
+
+        @Override
+        public void onAnimationStart(Animator animation) {
         }
     }
 }

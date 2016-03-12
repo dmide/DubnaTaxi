@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="border">#ffbcb8bd</color>
-    <color name="bg_default">#fffefaff</color>
-    <color name="bg_selected">#77e0dce1</color>
+    <color name="border">#b4b4b4</color>
+    <color name="bg_default">#fafafa</color>
+    <color name="bg_dimmed">#f6f6f6</color>
+    <color name="bg_selected">#eeeeee</color>
     <color name="bg_item">#ffe9e5ea</color>
     <color name="orange_transparent">#99ffb300</color>
     <color name="orange">#ffa200</color>

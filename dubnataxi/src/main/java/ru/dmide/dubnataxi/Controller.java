@@ -14,6 +14,7 @@ import android.widget.ListView;
 
 import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.SwipeDismissAdapter;
 import com.nineoldandroids.animation.Animator;
+import com.nineoldandroids.animation.ValueAnimator;
 
 import ru.dmide.dubnataxi.activity.InfoActivity;
 import ru.dmide.dubnataxi.adapters.PhonesAdapter;
@@ -25,14 +26,19 @@ import static ru.dmide.dubnataxi.activity.BaseActivity.viewById;
  */
 public class Controller {
     private static final String SHOULD_SHOW_PHONES_DELETION_TIP = "SHOULD_SHOW_PHONES_DELETION_TIP";
+    private static final int PHONES_ANIMATION_DURATION = 250;
 
     private final ModelFragment model;
+    private volatile boolean phonesAnimationInProgress;
 
     public Controller(ModelFragment model) {
         this.model = model;
     }
 
     public void onServiceClick(View serviceView, String serviceId) {
+        if (phonesAnimationInProgress){
+            return;
+        }
         if (model.isServiceSelected(serviceId)) {
             hidePhones(serviceView);
             model.removeSelectedService(serviceId);
@@ -81,25 +87,26 @@ public class Controller {
     }
 
     private void hidePhones(View serviceView) {
-        ListView phonesList = viewById(serviceView, R.id.phones_list);
-        ViewHelper.collapse(phonesList, 200).addListener(new ViewHelper.AnimationEndListener() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                viewById(serviceView, R.id.separator).setVisibility(View.GONE);
-            }
-        });
+        collapsePhonesList(serviceView);
         ViewCompat.animate(viewById(serviceView, R.id.arrow))
-                .rotationBy(-90)
-                .setDuration(200)
+                .rotation(0)
+                .setDuration(PHONES_ANIMATION_DURATION)
                 .start();
     }
 
     private void showPhones(final View serviceView, String serviceId) {
         ListView phonesList = viewById(serviceView, R.id.phones_list);
-        viewById(serviceView, R.id.separator).setVisibility(View.VISIBLE);
-
         PhonesAdapter phonesAdapter = new PhonesAdapter(model, serviceId);
+        preparePhonesList(serviceView, phonesList, phonesAdapter);
 
+        expandPhonesList(serviceView, phonesList, phonesAdapter);
+        ViewCompat.animate(viewById(serviceView, R.id.arrow))
+                .rotation(-270)
+                .setDuration(PHONES_ANIMATION_DURATION)
+                .start();
+    }
+
+    private void preparePhonesList(View serviceView, ListView phonesList, PhonesAdapter phonesAdapter) {
         SwipeDismissAdapter dismissAdapter = new SwipeDismissAdapter(phonesAdapter, (viewGroup, ints) -> {
             String phoneNumber = phonesAdapter.getItem(ints[0]);
             model.deletePhoneNumber(phoneNumber);
@@ -119,13 +126,44 @@ public class Controller {
             onPhoneNumberClick(phonesAdapter.getItem(position));
             phonesAdapter.notifyDataSetChanged();
         });
+    }
 
-        int phonesCount = phonesAdapter.getCount();
-        int height = ViewHelper.calcListViewHeight(serviceView.getContext(), phonesCount);
-        ViewHelper.expand(phonesList, 200, height);
-        ViewCompat.animate(viewById(serviceView, R.id.arrow))
-                .rotationBy(90)
-                .setDuration(200)
-                .start();
+    private void expandPhonesList(View serviceView, ListView phonesList, PhonesAdapter phonesAdapter) {
+        phonesAnimationInProgress = true;
+        Context c = serviceView.getContext();
+        int listHeight = ViewHelper.calcListViewHeight(c, phonesAdapter.getCount());
+        int shadowHeight = (int) c.getResources().getDimension(R.dimen.shadow_height);
+        View shadowDown = viewById(serviceView, R.id.shadow_down);
+        View shadowUp = viewById(serviceView, R.id.shadow_up);
+
+        ValueAnimator expandAnimator = ViewHelper.getExpandAnimator(phonesList, PHONES_ANIMATION_DURATION, listHeight);
+        expandAnimator.addUpdateListener(animation -> {
+            if (shadowDown.getVisibility() != View.VISIBLE && listHeight * animation.getAnimatedFraction() >= shadowHeight) {
+                shadowDown.setVisibility(View.VISIBLE);
+                shadowUp.setVisibility(View.VISIBLE);
+            }
+        });
+        expandAnimator.addListener(new ViewHelper.AnimationEndListener() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                phonesAnimationInProgress = false;
+            }
+        });
+        expandAnimator.start();
+    }
+
+    private void collapsePhonesList(final View serviceView) {
+        phonesAnimationInProgress = true;
+        ListView phonesList = viewById(serviceView, R.id.phones_list);
+        ValueAnimator collapseAnimator = ViewHelper.getCollapseAnimator(phonesList, PHONES_ANIMATION_DURATION);
+        collapseAnimator.addListener(new ViewHelper.AnimationEndListener() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                viewById(serviceView, R.id.shadow_down).setVisibility(View.GONE);
+                viewById(serviceView, R.id.shadow_up).setVisibility(View.GONE);
+                phonesAnimationInProgress = false;
+            }
+        });
+        collapseAnimator.start();
     }
 }

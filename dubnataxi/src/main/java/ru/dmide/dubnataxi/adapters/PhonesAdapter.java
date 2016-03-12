@@ -1,6 +1,5 @@
 package ru.dmide.dubnataxi.adapters;
 
-import android.os.Build;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +9,7 @@ import android.widget.TextView;
 import com.nhaarman.listviewanimations.ArrayAdapter;
 
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import ru.dmide.dubnataxi.ModelFragment;
@@ -23,12 +23,21 @@ public class PhonesAdapter extends ArrayAdapter {
 
     private final ModelFragment model;
     private final String serviceId;
+    private final LinkedList<View> convertViewsEager;
     private List<String> phones = Collections.emptyList();
 
     public PhonesAdapter(ModelFragment model, String serviceId) {
         this.model = model;
         this.serviceId = serviceId;
         this.phones = model.getPhonesForService(serviceId);
+
+        //optimization to avoid inflation when the service view is animated (expanding)
+        LayoutInflater inflater = LayoutInflater.from(model.getActivity());
+        convertViewsEager = new LinkedList<>();
+        for (int i = 0; i < phones.size() * 3; i++) {
+            View view = inflater.inflate(R.layout.phone_view, null);
+            convertViewsEager.add(view);
+        }
     }
 
     @Override
@@ -40,22 +49,30 @@ public class PhonesAdapter extends ArrayAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
-            LayoutInflater inflater = LayoutInflater.from(model.getActivity());
-            convertView = inflater.inflate(R.layout.phone_view, null);
-        }
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            convertView.setBackgroundColor(convertView.getContext().getResources().getColor(R.color.bg_default));
-        }
-        TextView textView = viewById(convertView, R.id.phone_number_tv);
-        String phone = phones.get(position);
-        textView.setText(phone);
-        viewById(convertView, R.id.called).setVisibility(model.isPhoneNumberCalled(phone) ? View.VISIBLE : View.INVISIBLE);
+            if (!convertViewsEager.isEmpty()) {
+                convertView = convertViewsEager.pop();
+            } else {
+                // sometimes on 4.* system passes here nulls several times for the same position
+                // I'm too lazy now to delve into SDK sources to find out why
+                // so in these situations eager works only partly
+                convertView = LayoutInflater.from(model.getActivity()).inflate(R.layout.phone_view, parent, false);
+            }
 
-        if (getItemViewType(position) == SELECTED) {
-            convertView.setBackgroundResource(R.drawable.selected_state);
-        } else {
-            convertView.setBackgroundResource(R.drawable.default_state);
+            if (getItemViewType(position) == SELECTED) {
+                convertView.setBackgroundResource(R.drawable.selected_state);
+            } else {
+                convertView.setBackgroundResource(R.drawable.default_state);
+            }
+            ViewHolder holder = new ViewHolder();
+            holder.phoneTV = viewById(convertView, R.id.phone_number_tv);
+            holder.calledIcon = viewById(convertView, R.id.called);
+            convertView.setTag(holder);
         }
+        ViewHolder holder = (ViewHolder) convertView.getTag();
+
+        String phone = phones.get(position);
+        holder.phoneTV.setText(phone);
+        holder.calledIcon.setVisibility(model.isPhoneNumberCalled(phone) ? View.VISIBLE : View.INVISIBLE);
 
         return convertView;
     }
@@ -72,12 +89,18 @@ public class PhonesAdapter extends ArrayAdapter {
 
     @Override
     public int getItemViewType(int position) {
-        return model.getLastCalledNumber().equals(getItem(position)) ? SELECTED : UNSELECTED;
+        int i = model.getLastCalledNumber().equals(getItem(position)) ? SELECTED : UNSELECTED;
+        return i;
     }
 
     @NonNull
     @Override
     public String getItem(int position) {
         return phones.get(position);
+    }
+
+    private static class ViewHolder {
+        TextView phoneTV;
+        View calledIcon;
     }
 }

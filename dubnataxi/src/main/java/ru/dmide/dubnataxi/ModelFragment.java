@@ -143,6 +143,10 @@ public class ModelFragment extends android.support.v4.app.Fragment {
         selectedServices.remove(service);
     }
 
+    public void removeAllSelections(){
+        selectedServices.clear();
+    }
+
     public boolean isServiceSelected(String id) {
         return selectedServices.contains(id);
     }

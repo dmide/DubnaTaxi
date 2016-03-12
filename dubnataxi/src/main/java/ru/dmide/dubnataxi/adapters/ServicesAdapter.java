@@ -4,14 +4,14 @@ import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 import android.widget.TextView;
-
 
 import com.nhaarman.listviewanimations.ArrayAdapter;
 
-import ru.dmide.dubnataxi.activity.MainActivity;
 import ru.dmide.dubnataxi.ModelFragment;
 import ru.dmide.dubnataxi.R;
+import ru.dmide.dubnataxi.activity.MainActivity;
 
 import static ru.dmide.dubnataxi.activity.BaseActivity.viewById;
 
@@ -34,12 +34,15 @@ public class ServicesAdapter extends ArrayAdapter {
         }
         TextView textView = viewById(convertView, R.id.text);
         textView.setText(model.getServices().get(position));
+        ListView list = viewById(convertView, R.id.phones_list);
         if (getItemViewType(position) == SELECTED) {
-            viewById(convertView, R.id.phones_list).setVisibility(View.VISIBLE);
-            viewById(convertView, R.id.separator).setVisibility(View.VISIBLE);
+            list.setVisibility(View.VISIBLE);
+            viewById(convertView, R.id.shadow_down).setVisibility(View.VISIBLE);
+            viewById(convertView, R.id.shadow_up).setVisibility(View.VISIBLE);
         } else {
-            viewById(convertView, R.id.phones_list).setVisibility(View.GONE);
-            viewById(convertView, R.id.separator).setVisibility(View.GONE);
+            list.setVisibility(View.GONE);
+            viewById(convertView, R.id.shadow_down).setVisibility(View.GONE);
+            viewById(convertView, R.id.shadow_up).setVisibility(View.GONE);
         }
 
         return convertView;

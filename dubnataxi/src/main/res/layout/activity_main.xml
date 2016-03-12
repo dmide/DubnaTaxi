@@ -8,6 +8,6 @@
         android:id="@+id/services_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        style="@style/ListViewStyle"/>
+        android:listSelector="@color/transparent" />
 
 </android.support.v4.widget.SwipeRefreshLayout>

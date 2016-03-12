@@ -44,6 +44,7 @@ public class MainActivity extends BaseActivity implements ModelFragment.DataList
                 R.color.dark_grey);
 
         model = initModel();
+        model.removeAllSelections(); // clear selection after config. change
         controller = new Controller(model);
         initServicesListView();
     }
