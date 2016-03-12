@@ -59,8 +59,7 @@ public class ViewHelper {
     public static int calcListViewHeight(Context c, int itemsCount) {
         Resources r = c.getResources();
         float listItemHeight = r.getDimension(R.dimen.list_item_height);
-        float dp = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, listItemHeight, r.getDisplayMetrics());
-        return Math.round(itemsCount * dp);
+        return Math.round(itemsCount * listItemHeight);
     }
 
     public static Snackbar makeStyledSnack(@NonNull View view, int resId, int duration) {
