@@ -131,8 +131,9 @@ public class MainActivity extends BaseActivity implements ModelFragment.DataList
         servicesListView.setDivider(null);
 
         servicesAdapter = new ServicesAdapter(this, model);
-        AnimationAdapter animAdapter = new ScaleInAnimationAdapter(servicesAdapter);
+        AnimationAdapter animAdapter = new ScaleInAnimationAdapter(servicesAdapter,.8f);
         animAdapter.setAbsListView(servicesListView);
+        animAdapter.getViewAnimator().setAnimationDelayMillis(60);
         servicesListView.setAdapter(animAdapter);
 
         servicesListView.setOnItemClickListener((parent, view, groupPos, id) -> {
