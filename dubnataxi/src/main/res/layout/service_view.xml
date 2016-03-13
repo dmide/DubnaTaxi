@@ -29,20 +29,20 @@
         android:src="@drawable/ic_arrow_right" />
 
     <View
-        android:id="@+id/bottom_separator"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_below="@id/text"
         android:layout_alignParentBottom="true"
-        android:background="@drawable/shadow_down" />
+        android:background="@color/list_divider" />
 
     <ListView
         android:id="@+id/phones_list"
         android:visibility="gone"
-        android:layout_below="@id/bottom_separator"
+        android:layout_below="@id/text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/bg_dimmed"
+        android:background="@color/bg_bottom"
+        android:divider="@color/bg_bottom"
+        android:dividerHeight="2dp"
         android:scrollbars="none"
         style="@style/ListViewStyle"
         />

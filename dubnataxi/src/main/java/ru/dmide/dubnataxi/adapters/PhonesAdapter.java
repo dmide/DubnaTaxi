@@ -40,6 +40,10 @@ public class PhonesAdapter extends ArrayAdapter {
         }
     }
 
+    public String getServiceId() {
+        return serviceId;
+    }
+
     @Override
     public void notifyDataSetChanged() {
         this.phones = model.getPhonesForService(serviceId);
@@ -61,7 +65,7 @@ public class PhonesAdapter extends ArrayAdapter {
             if (getItemViewType(position) == SELECTED) {
                 convertView.setBackgroundResource(R.drawable.selected_state);
             } else {
-                convertView.setBackgroundResource(R.drawable.default_state);
+                convertView.setBackgroundResource(R.drawable.phones_selector);
             }
             ViewHolder holder = new ViewHolder();
             holder.phoneTV = viewById(convertView, R.id.phone_number_tv);
@@ -89,8 +93,7 @@ public class PhonesAdapter extends ArrayAdapter {
 
     @Override
     public int getItemViewType(int position) {
-        int i = model.getLastCalledNumber().equals(getItem(position)) ? SELECTED : UNSELECTED;
-        return i;
+        return model.getLastCalledNumber().equals(getItem(position)) ? SELECTED : UNSELECTED;
     }
 
     @NonNull

@@ -50,6 +50,12 @@ public class ViewHelper {
         return snack;
     }
 
+    public static void applyVisibility(View[] views, int vis) {
+        for (View v : views) {
+            v.setVisibility(vis);
+        }
+    }
+
     public static abstract class AnimationEndListener implements Animator.AnimatorListener {
         @Override
         public void onAnimationCancel(Animator animation) {
