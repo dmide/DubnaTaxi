@@ -26,7 +26,8 @@ import static ru.dmide.dubnataxi.activity.BaseActivity.viewById;
  */
 public class Controller {
     private static final String SHOULD_SHOW_PHONES_DELETION_TIP = "SHOULD_SHOW_PHONES_DELETION_TIP";
-    private static final int PHONES_ANIMATION_DURATION = 250;
+    private static final int PHONES_REVEAL_ANIMATION_DURATION = 250;
+    private static final int PHONES_REMOVAL_ANIMATION_DURATION = 150;
 
     private final ModelFragment model;
     private volatile boolean phonesAnimationInProgress;
@@ -36,7 +37,7 @@ public class Controller {
     }
 
     public void onServiceClick(View serviceView, String serviceId) {
-        if (phonesAnimationInProgress){
+        if (phonesAnimationInProgress) {
             return;
         }
         if (model.isServiceSelected(serviceId)) {
@@ -90,7 +91,7 @@ public class Controller {
         collapsePhonesList(serviceView);
         ViewCompat.animate(viewById(serviceView, R.id.arrow))
                 .rotation(0)
-                .setDuration(PHONES_ANIMATION_DURATION)
+                .setDuration(PHONES_REVEAL_ANIMATION_DURATION)
                 .start();
     }
 
@@ -102,20 +103,26 @@ public class Controller {
         expandPhonesList(serviceView, phonesList, phonesAdapter);
         ViewCompat.animate(viewById(serviceView, R.id.arrow))
                 .rotation(-270)
-                .setDuration(PHONES_ANIMATION_DURATION)
+                .setDuration(PHONES_REVEAL_ANIMATION_DURATION)
                 .start();
     }
 
     private void preparePhonesList(View serviceView, ListView phonesList, PhonesAdapter phonesAdapter) {
         SwipeDismissAdapter dismissAdapter = new SwipeDismissAdapter(phonesAdapter, (viewGroup, ints) -> {
+            Context c = serviceView.getContext();
             String phoneNumber = phonesAdapter.getItem(ints[0]);
             model.deletePhoneNumber(phoneNumber);
             phonesAdapter.notifyDataSetChanged();
+
+            int initialHeight = ViewHelper.calcListViewHeight(c, phonesAdapter.getCount() + 1);
+            int newHeight = ViewHelper.calcListViewHeight(c, phonesAdapter.getCount());
+            ViewHelper.getResizeAnimator(phonesList, PHONES_REMOVAL_ANIMATION_DURATION, initialHeight, newHeight).start();
 
             ViewHelper.makeStyledSnack(serviceView, R.string.phone_deleted, Snackbar.LENGTH_LONG)
                     .setAction(R.string.cancel, v -> {
                         model.restorePhoneNumber(phoneNumber);
                         phonesAdapter.notifyDataSetChanged();
+                        ViewHelper.getResizeAnimator(phonesList, PHONES_REMOVAL_ANIMATION_DURATION, newHeight, initialHeight).start();
                     })
                     .show();
         });
@@ -136,7 +143,8 @@ public class Controller {
         View shadowDown = viewById(serviceView, R.id.shadow_down);
         View shadowUp = viewById(serviceView, R.id.shadow_up);
 
-        ValueAnimator expandAnimator = ViewHelper.getExpandAnimator(phonesList, PHONES_ANIMATION_DURATION, listHeight);
+        ValueAnimator expandAnimator = ViewHelper.getResizeAnimator(phonesList, PHONES_REVEAL_ANIMATION_DURATION, 0, listHeight);
+        phonesList.setVisibility(View.VISIBLE);
         expandAnimator.addUpdateListener(animation -> {
             if (shadowDown.getVisibility() != View.VISIBLE && listHeight * animation.getAnimatedFraction() >= shadowHeight) {
                 shadowDown.setVisibility(View.VISIBLE);
@@ -155,12 +163,14 @@ public class Controller {
     private void collapsePhonesList(final View serviceView) {
         phonesAnimationInProgress = true;
         ListView phonesList = viewById(serviceView, R.id.phones_list);
-        ValueAnimator collapseAnimator = ViewHelper.getCollapseAnimator(phonesList, PHONES_ANIMATION_DURATION);
+        int initialHeight = phonesList.getLayoutParams().height;
+        ValueAnimator collapseAnimator = ViewHelper.getResizeAnimator(phonesList, PHONES_REVEAL_ANIMATION_DURATION, initialHeight, 0);
         collapseAnimator.addListener(new ViewHelper.AnimationEndListener() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 viewById(serviceView, R.id.shadow_down).setVisibility(View.GONE);
                 viewById(serviceView, R.id.shadow_up).setVisibility(View.GONE);
+                phonesList.setVisibility(View.GONE);
                 phonesAnimationInProgress = false;
             }
         });

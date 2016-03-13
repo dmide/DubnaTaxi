@@ -19,34 +19,13 @@ import com.nineoldandroids.animation.ValueAnimator;
  */
 public class ViewHelper {
 
-    public static ValueAnimator getExpandAnimator(final View v, int duration, int targetHeight) {
+    public static ValueAnimator getResizeAnimator(final View v, int duration, int fromHeight, int toHeight) {
         ViewGroup.LayoutParams lp = v.getLayoutParams();
-        lp.height = 0;
-        v.setVisibility(View.VISIBLE);
-        ValueAnimator valueAnimator = ValueAnimator.ofInt(0, targetHeight);
+        lp.height = fromHeight;
+        ValueAnimator valueAnimator = ValueAnimator.ofInt(fromHeight, toHeight);
         valueAnimator.addUpdateListener(animation -> {
             lp.height = (int) animation.getAnimatedValue();
             v.requestLayout();
-        });
-        valueAnimator.setInterpolator(new AccelerateInterpolator());
-        valueAnimator.setDuration(duration);
-        return valueAnimator;
-    }
-
-    public static ValueAnimator getCollapseAnimator(final View v, int duration) {
-        final ViewGroup.LayoutParams lp = v.getLayoutParams();
-        final int initialHeight = lp.height;
-        ValueAnimator valueAnimator = ValueAnimator.ofInt(initialHeight, 0);
-        valueAnimator.addUpdateListener(animation -> {
-            lp.height = (int) animation.getAnimatedValue();
-            v.requestLayout();
-        });
-        valueAnimator.addListener(new AnimationEndListener() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                v.setVisibility(View.GONE);
-                lp.height = initialHeight;
-            }
         });
         valueAnimator.setInterpolator(new AccelerateInterpolator());
         valueAnimator.setDuration(duration);
