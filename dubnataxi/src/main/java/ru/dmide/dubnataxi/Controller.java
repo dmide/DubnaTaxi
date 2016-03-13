@@ -71,7 +71,7 @@ public class Controller {
             activity.startActivity(callIntent);
         } else {
             if (!ActivityCompat.shouldShowRequestPermissionRationale(activity,
-                    Manifest.permission.CALL_PHONE)){
+                    Manifest.permission.CALL_PHONE)) {
                 ActivityCompat.requestPermissions(activity, new String[]{callPhonePermission}, PERMISSION_REQUEST_CODE);
             } else {
                 //if permission have been denied, fallback to dial
@@ -134,8 +134,9 @@ public class Controller {
             model.deletePhoneNumber(phoneNumber);
             phonesAdapter.notifyDataSetChanged();
 
-            int initialHeight = ViewHelper.calcListViewHeight(c, phonesAdapter.getCount() + 1);
-            int newHeight = ViewHelper.calcListViewHeight(c, phonesAdapter.getCount());
+            float dividerHeight = c.getResources().getDimension(R.dimen.phones_list_divider_height);
+            int initialHeight = ViewHelper.calcListViewHeight(c, phonesAdapter.getCount() + 1, dividerHeight);
+            int newHeight = ViewHelper.calcListViewHeight(c, phonesAdapter.getCount(), dividerHeight);
 
             ViewHelper.makeStyledSnack(serviceView, R.string.phone_deleted, Snackbar.LENGTH_LONG)
                     .setAction(R.string.cancel, v -> {
@@ -175,7 +176,8 @@ public class Controller {
     private void expandPhonesList(View serviceView, PhonesAdapter phonesAdapter) {
         phonesAnimationInProgress = true;
         ServicesAdapter.ViewHolder holder = (ServicesAdapter.ViewHolder) serviceView.getTag();
-        int targetHeight = ViewHelper.calcListViewHeight(serviceView.getContext(), phonesAdapter.getCount());
+        float dividerHeight = serviceView.getContext().getResources().getDimension(R.dimen.phones_list_divider_height);
+        int targetHeight = ViewHelper.calcListViewHeight(serviceView.getContext(), phonesAdapter.getCount(), dividerHeight);
 
         ValueAnimator expandAnimator = ViewHelper.getResizeAnimator(holder.phonesList, PHONES_REVEAL_ANIMATION_DURATION, 0, targetHeight);
         expandAnimator.addUpdateListener(animation -> {

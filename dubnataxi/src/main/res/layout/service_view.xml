@@ -42,7 +42,7 @@
         android:layout_height="wrap_content"
         android:background="@color/bg_bottom"
         android:divider="@color/bg_bottom"
-        android:dividerHeight="2dp"
+        android:dividerHeight="@dimen/phones_list_divider_height"
         android:scrollbars="none"
         style="@style/ListViewStyle"
         />

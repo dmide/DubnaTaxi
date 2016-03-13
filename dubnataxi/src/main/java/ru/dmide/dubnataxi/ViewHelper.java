@@ -32,10 +32,10 @@ public class ViewHelper {
         return valueAnimator;
     }
 
-    public static int calcListViewHeight(Context c, int itemsCount) {
+    public static int calcListViewHeight(Context c, int itemsCount, float dividerHeight) {
         Resources r = c.getResources();
         float listItemHeight = r.getDimension(R.dimen.list_item_height);
-        return Math.round(itemsCount * listItemHeight);
+        return Math.round(itemsCount * listItemHeight + itemsCount * dividerHeight);
     }
 
     public static Snackbar makeStyledSnack(@NonNull View view, int resId, int duration) {
