@@ -1,6 +1,9 @@
 package ru.dmide.dubnataxi;
 
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
@@ -20,12 +23,10 @@ import java.util.Set;
 
 import retrofit2.Call;
 import retrofit2.Callback;
-import retrofit2.GsonConverterFactory;
 import retrofit2.Response;
-import retrofit2.Retrofit;
+import ru.dmide.dubnataxi.web.NetworkClient;
 import ru.dmide.dubnataxi.web.Service;
 import ru.dmide.dubnataxi.web.ServicesListResponse;
-import ru.dmide.dubnataxi.web.WebAPI;
 
 /**
  * Created by drevis on 19.02.14.
@@ -48,10 +49,13 @@ public class ModelFragment extends android.support.v4.app.Fragment {
     private List<String> selectedServices = new ArrayList<>();
     private String lastCalledNumber = "";
     private boolean isLoaded;
+    private NetworkClient networkClient;
+    private Context applicationContext;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        applicationContext = getContext().getApplicationContext();
         contentUrl = getString(R.string.content_url);
         preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
@@ -60,19 +64,23 @@ public class ModelFragment extends android.support.v4.app.Fragment {
         phonesMap.put(DELETED_SERVICES, deletedServices);
 
         loadUserActions();
-        loadContent(true, false);
+        loadContent(false);
     }
 
     public SharedPreferences getSharedPrefs() {
         return preferences;
     }
 
-    public void loadContent(boolean useCache, boolean clear) {
+    public void loadContent(boolean clear) {
         isLoaded = false;
         if (clear) {
             restoreDeletedValues();
         }
         loadContent();
+    }
+
+    public Context getApplicationContext() {
+        return applicationContext;
     }
 
     public void subscribe(DataListener dataListener) {
@@ -143,7 +151,7 @@ public class ModelFragment extends android.support.v4.app.Fragment {
         selectedServices.remove(service);
     }
 
-    public void removeAllSelections(){
+    public void removeAllSelections() {
         selectedServices.clear();
     }
 
@@ -157,6 +165,13 @@ public class ModelFragment extends android.support.v4.app.Fragment {
 
     public void setShouldShowRateDialog(boolean value) {
         preferences.edit().putBoolean(ModelFragment.TO_RATE_OR_NOT_TO_RATE, value).apply();
+    }
+
+    public boolean isOnline() {
+        ConnectivityManager cm =
+                (ConnectivityManager) applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
     private void loadUserActions() {
@@ -196,12 +211,10 @@ public class ModelFragment extends android.support.v4.app.Fragment {
 
     private void loadContent() {
         notifyDataSetLoading();
-        Retrofit retrofit = new Retrofit.Builder()
-                .addConverterFactory(GsonConverterFactory.create())
-                .baseUrl(contentUrl)
-                .build();
-        WebAPI api = retrofit.create(WebAPI.class);
-        Call<ServicesListResponse> listCall = api.getServices();
+        if (networkClient == null) {
+            networkClient = new NetworkClient(this, contentUrl);
+        }
+        Call<ServicesListResponse> listCall = networkClient.getApi().getServices();
         listCall.enqueue(new Callback<ServicesListResponse>() {
             @Override
             public void onResponse(Response<ServicesListResponse> response) {

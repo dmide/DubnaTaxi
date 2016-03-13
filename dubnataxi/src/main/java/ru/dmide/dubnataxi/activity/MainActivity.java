@@ -38,7 +38,7 @@ public class MainActivity extends BaseActivity implements ModelFragment.DataList
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        swipeRefreshLayout.setOnRefreshListener(() -> model.loadContent(false, false));
+        swipeRefreshLayout.setOnRefreshListener(() -> model.loadContent(false));
         swipeRefreshLayout.setColorSchemeResources(
                 R.color.orange,
                 R.color.dark_grey);
@@ -83,7 +83,7 @@ public class MainActivity extends BaseActivity implements ModelFragment.DataList
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_clear:
-                model.loadContent(false, true);
+                model.loadContent(true);
                 return true;
             case R.id.info:
                 controller.showInfo();
