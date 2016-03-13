@@ -1,11 +1,13 @@
 package ru.dmide.dubnataxi;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewCompat;
 import android.view.View;
@@ -26,6 +28,7 @@ import static ru.dmide.dubnataxi.activity.BaseActivity.viewById;
  * Created by drevis on 19.02.14.
  */
 public class Controller {
+    public static final int PERMISSION_REQUEST_CODE = 1;
     private static final String SHOULD_SHOW_PHONES_DELETION_TIP = "SHOULD_SHOW_PHONES_DELETION_TIP";
     private static final int PHONES_REVEAL_ANIMATION_DURATION = 250;
     private static final int PHONES_REMOVAL_ANIMATION_DURATION = 150;
@@ -60,7 +63,23 @@ public class Controller {
         Intent callIntent = new Intent(Intent.ACTION_CALL);
         callIntent.setData(Uri.parse("tel:" + number));
         model.onPhoneNumberCalled(number);
-        model.getActivity().startActivity(callIntent);
+
+        FragmentActivity activity = model.getActivity();
+        String callPhonePermission = Manifest.permission.CALL_PHONE;
+        int permissionStatus = ActivityCompat.checkSelfPermission(activity, callPhonePermission);
+        if (permissionStatus == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            activity.startActivity(callIntent);
+        } else {
+            if (!ActivityCompat.shouldShowRequestPermissionRationale(activity,
+                    Manifest.permission.CALL_PHONE)){
+                ActivityCompat.requestPermissions(activity, new String[]{callPhonePermission}, PERMISSION_REQUEST_CODE);
+            } else {
+                //if permission have been denied, fallback to dial
+                Intent dialIntent = new Intent(Intent.ACTION_DIAL);
+                dialIntent.setData(Uri.parse("tel:" + number));
+                activity.startActivity(dialIntent);
+            }
+        }
     }
 
     public void showRateDialog() {

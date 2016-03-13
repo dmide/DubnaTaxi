@@ -128,6 +128,7 @@ public class ModelFragment extends android.support.v4.app.Fragment {
     }
 
     public void deleteService(String service) {
+        removeSelectedService(service);
         deletedServices.add(service);
         notifyDataSetChanged();
     }

@@ -3,6 +3,7 @@ package ru.dmide.dubnataxi.activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.Menu;
@@ -20,7 +21,7 @@ import ru.dmide.dubnataxi.ModelFragment;
 import ru.dmide.dubnataxi.R;
 import ru.dmide.dubnataxi.adapters.ServicesAdapter;
 
-public class MainActivity extends BaseActivity implements ModelFragment.DataListener {
+public class MainActivity extends BaseActivity implements ModelFragment.DataListener, ActivityCompat.OnRequestPermissionsResultCallback {
     public static final String MODEL = "MODEL";
 
     private ModelFragment model;
@@ -108,6 +109,15 @@ public class MainActivity extends BaseActivity implements ModelFragment.DataList
     }
 
     @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == Controller.PERMISSION_REQUEST_CODE) {
+            //retry to make a call if permission is granted
+            //or perform dial otherwise
+            controller.onPhoneNumberClick(model.getLastCalledNumber());
+        }
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == InfoActivity.REQUEST_CODE && resultCode == InfoActivity.RESULT_CODE_RATED) {
             model.setShouldShowRateDialog(false);
@@ -131,7 +141,7 @@ public class MainActivity extends BaseActivity implements ModelFragment.DataList
         servicesListView.setDivider(null);
 
         servicesAdapter = new ServicesAdapter(this, model);
-        AnimationAdapter animAdapter = new ScaleInAnimationAdapter(servicesAdapter,.8f);
+        AnimationAdapter animAdapter = new ScaleInAnimationAdapter(servicesAdapter, .8f);
         animAdapter.setAbsListView(servicesListView);
         animAdapter.getViewAnimator().setAnimationDelayMillis(60);
         servicesListView.setAdapter(animAdapter);
