@@ -5,14 +5,14 @@
 
     <ImageView
         android:id="@+id/called"
-        android:layout_width="wrap_content"
+        android:layout_width="30dp"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_gravity="center_vertical"
         android:paddingRight="@dimen/drawable_padding"
         android:paddingTop="@dimen/drawable_padding"
         android:paddingLeft="@dimen/drawable_padding"
-        android:layout_marginTop="@dimen/called_drawable_paddingtop"
+        android:layout_marginTop="25dp"
         android:src="@drawable/ic_called"
         android:visibility="invisible"/>
 
