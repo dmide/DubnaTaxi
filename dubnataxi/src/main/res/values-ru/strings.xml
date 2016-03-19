@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="time_unknown">недавно</string>
+    <string name="time_just_now">только что</string>
+    <string name="time_a_minute_ago">минуту назад</string>
+    <string name="time_minutes_ago">" мин. назад"</string>
+    <string name="time_yesterday">вчера</string>
+    <string name="time_today">сегодня</string>
+</resources>

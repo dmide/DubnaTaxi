@@ -109,6 +109,7 @@ public class ModelFragment extends android.support.v4.app.Fragment {
     public void onPhoneNumberCalled(String number) {
         lastCalledNumber = number;
         calledPhones.add(number);
+        preferences.edit().putLong(number, System.currentTimeMillis()).apply();
     }
 
     public String getLastCalledNumber() {
@@ -117,6 +118,10 @@ public class ModelFragment extends android.support.v4.app.Fragment {
 
     public boolean isPhoneNumberCalled(String number) {
         return calledPhones.contains(number);
+    }
+
+    public long getPhoneNumberCalledTime(String number) {
+        return preferences.getLong(number, 0);
     }
 
     public void deletePhoneNumber(String phone) {
@@ -128,7 +133,7 @@ public class ModelFragment extends android.support.v4.app.Fragment {
     }
 
     public void deleteService(String service) {
-        removeSelectedService(service);
+        removeAllSelections();
         deletedServices.add(service);
         notifyDataSetChanged();
     }

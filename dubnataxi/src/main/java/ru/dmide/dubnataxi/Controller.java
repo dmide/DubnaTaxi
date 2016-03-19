@@ -18,6 +18,9 @@ import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.SwipeDismis
 import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.animation.ValueAnimator;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import ru.dmide.dubnataxi.activity.InfoActivity;
 import ru.dmide.dubnataxi.adapters.PhonesAdapter;
 import ru.dmide.dubnataxi.adapters.ServicesAdapter;
@@ -33,8 +36,9 @@ public class Controller {
     private static final int PHONES_REVEAL_ANIMATION_DURATION = 250;
     private static final int PHONES_REMOVAL_ANIMATION_DURATION = 150;
 
-    private final ModelFragment model;
     private volatile boolean phonesAnimationInProgress;
+    private final ModelFragment model;
+    private final Map<String, PhonesAdapter> activePhonesAdapters = new HashMap<>();
 
     public Controller(ModelFragment model) {
         this.model = model;
@@ -45,7 +49,7 @@ public class Controller {
             return;
         }
         if (model.isServiceSelected(serviceId)) {
-            hidePhones(serviceView);
+            hidePhones(serviceView, serviceId);
             model.removeSelectedService(serviceId);
         } else {
             showPhones(serviceView, serviceId);
@@ -106,8 +110,15 @@ public class Controller {
         activity.startActivityForResult(intent, InfoActivity.REQUEST_CODE);
     }
 
-    private void hidePhones(View serviceView) {
+    public void updatePhonesAdapters() {
+        for (PhonesAdapter adapter : activePhonesAdapters.values()) {
+            adapter.notifyDataSetChanged();
+        }
+    }
+
+    private void hidePhones(View serviceView, String serviceId) {
         collapsePhonesList(serviceView);
+        activePhonesAdapters.remove(serviceId);
         ViewCompat.animate(viewById(serviceView, R.id.arrow))
                 .rotation(0)
                 .setDuration(PHONES_REVEAL_ANIMATION_DURATION)
@@ -118,6 +129,7 @@ public class Controller {
         ListView phonesList = viewById(serviceView, R.id.phones_list);
         PhonesAdapter phonesAdapter = new PhonesAdapter(model, serviceId);
         preparePhonesList(serviceView, phonesList, phonesAdapter);
+        activePhonesAdapters.put(serviceId, phonesAdapter);
 
         expandPhonesList(serviceView, phonesAdapter);
         ViewCompat.animate(viewById(serviceView, R.id.arrow))

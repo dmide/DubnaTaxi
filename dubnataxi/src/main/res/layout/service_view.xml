@@ -20,7 +20,7 @@
     <ImageView
         android:id="@+id/arrow"
         android:layout_width="50dp"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/list_item_height"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:layout_gravity="center_vertical"

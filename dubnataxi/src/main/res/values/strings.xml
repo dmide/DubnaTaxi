@@ -45,4 +45,11 @@
 
     <string name="donate_key">MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAif5i4DlVrmy1/breLbTA3X17Su2819taOLSsh8AZauTS/N6lwVAIi0vWVQPeWx4iEzgXc0h8gGBMoK/x56KR4gs4pUWfw6ZyeZdn1MOaePqCxKHKvUa5tigCJQVgpRYeCdR58shTGDYOttd2gmnKmRxeZcGa65h9r91UfcrVLWVTl3k67Sae0zEbZt8tZZTjNG3zzGKBoZtxmYZU8kgbAuKMtCSKUlUK7FaG+/hZxpCzcT7tmEXrRx4AAE9phlfdR9ebYdK9oJMJbfCUoQfnmdtbtGzotNqCKgCgxNK9ChiSL0TpUv+wJ2LkkdlBivHv1BakqpJCwe3tawABah2XYwIDAQAB</string>
 
+    <string name="time_unknown">awhile ago</string>
+    <string name="time_just_now">just now</string>
+    <string name="time_a_minute_ago">a minute ago</string>
+    <string name="time_minutes_ago">" minutes ago"</string>
+    <string name="time_yesterday">yesterday</string>
+    <string name="time_today">today</string>
+
 </resources>

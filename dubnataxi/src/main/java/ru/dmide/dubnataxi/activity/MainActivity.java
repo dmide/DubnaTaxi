@@ -3,6 +3,7 @@ package ru.dmide.dubnataxi.activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -23,6 +24,7 @@ import ru.dmide.dubnataxi.adapters.ServicesAdapter;
 
 public class MainActivity extends BaseActivity implements ModelFragment.DataListener, ActivityCompat.OnRequestPermissionsResultCallback {
     public static final String MODEL = "MODEL";
+    private static final int PHONES_ADAPTERS_REFRESH_RATE = 5000;
 
     private ModelFragment model;
     private Controller controller;
@@ -31,13 +33,23 @@ public class MainActivity extends BaseActivity implements ModelFragment.DataList
     ListView servicesListView;
     @Bind(R.id.swipe_container)
     SwipeRefreshLayout swipeRefreshLayout;
+
     private ServicesAdapter servicesAdapter;
+    private Handler handler;
+    private final Runnable phonesUpdateRunnable = new Runnable() {
+        @Override
+        public void run() {
+            controller.updatePhonesAdapters();
+            handler.postDelayed(this, PHONES_ADAPTERS_REFRESH_RATE);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        handler = new Handler();
 
         swipeRefreshLayout.setOnRefreshListener(() -> model.loadContent(false));
         swipeRefreshLayout.setColorSchemeResources(
@@ -54,12 +66,15 @@ public class MainActivity extends BaseActivity implements ModelFragment.DataList
     protected void onResume() {
         super.onResume();
         model.subscribe(this);
+        controller.updatePhonesAdapters();
+        handler.postDelayed(phonesUpdateRunnable, PHONES_ADAPTERS_REFRESH_RATE);
     }
 
     @Override
     protected void onPause() {
         model.saveUserActions();
         model.unsubscribe(this);
+        handler.removeCallbacks(phonesUpdateRunnable);
         super.onPause();
     }
 

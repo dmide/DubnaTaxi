@@ -1,35 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
+    android:paddingLeft="@dimen/phone_list_left_padding"
     android:layout_height="@dimen/list_item_height">
 
     <ImageView
         android:id="@+id/called"
-        android:layout_width="30dp"
+        android:layout_width="18dp"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_gravity="center_vertical"
-        android:paddingRight="@dimen/drawable_padding"
-        android:paddingTop="@dimen/drawable_padding"
-        android:paddingLeft="@dimen/drawable_padding"
-        android:layout_marginTop="25dp"
+        android:layout_alignParentBottom="true"
+        android:paddingRight="9dp"
+        android:paddingBottom="7dp"
         android:src="@drawable/ic_called"
-        android:visibility="invisible"/>
+        android:tint="#00AA00"
+        android:visibility="gone"/>
 
-    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    <TextView
+        android:id="@+id/called_time_ago"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/called"
+        android:layout_alignParentBottom="true"
+        android:paddingBottom="7dp"
+        android:textSize="12sp"
+        android:textColor="#606060"
+        android:visibility="gone" />
+
+    <TextView
         android:id="@+id/phone_number_tv"
         android:layout_width="wrap_content"
-        android:layout_height="@dimen/list_item_height"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
         android:gravity="center_vertical"
-        android:layout_toRightOf="@id/called"
-        android:textSize="@dimen/text_size_big" />
+        android:layout_alignParentLeft="true"
+        android:textSize="@dimen/text_size_upper_medium" />
 
     <ImageView
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/list_item_height"
         android:layout_alignParentRight="true"
         android:layout_gravity="center_vertical"
         android:layout_centerVertical="true"
+        android:layout_marginRight="3dp"
         android:padding="@dimen/drawable_padding"
         android:alpha="0.7"
         android:src="@drawable/ic_action_call" />
