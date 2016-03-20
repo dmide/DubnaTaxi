@@ -2,6 +2,7 @@ package ru.dmide.dubnataxi.adapters;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -136,8 +137,8 @@ public class PhonesAdapter extends ArrayAdapter {
             return diff / MINUTE_MILLIS + c.getString(R.string.time_minutes_ago);
         } else {
             Date date = new Date(time);
-            if (diff < 2 * DAY_MILLIS) {
-                String day = diff < DAY_MILLIS ? c.getString(R.string.time_today) : c.getString(R.string.time_yesterday);
+            if (diff < DAY_MILLIS) {
+                String day = DateUtils.isToday(time) ? c.getString(R.string.time_today) : c.getString(R.string.time_yesterday);
                 return day + ", " + new SimpleDateFormat("HH:mm").format(date);
             } else {
                 return new SimpleDateFormat("dd MMM, HH:mm").format(date);
