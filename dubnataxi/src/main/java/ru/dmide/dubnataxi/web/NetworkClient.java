@@ -45,7 +45,7 @@ public class NetworkClient {
             if (!modelFragment.isOnline()) {
                 Log.d(TAG, "rewriting request");
 
-                int maxStale = 60 * 60 * 24 * 28; // tolerate 4-weeks stale
+                int maxStale = 60 * 60 * 24 * 560; // tolerate 80-weeks stale
                 request = request.newBuilder()
                         .header("Cache-Control", "public, only-if-cached, max-stale=" + maxStale)
                         .build();
