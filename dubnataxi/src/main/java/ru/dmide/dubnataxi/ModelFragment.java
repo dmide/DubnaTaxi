@@ -5,11 +5,14 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
+
+import com.google.gson.Gson;
 
 import org.json.JSONArray;
 
@@ -36,6 +39,8 @@ public class ModelFragment extends android.support.v4.app.Fragment {
     private static final String CALLED_NUMS = "CALLED_NUMS";
     private static final String DELETED_NUMS = "DELETED_NUMS";
     private static final String DELETED_SERVICES = "DELETED_SERVICES";
+    public static final String SERVICES_JSON = "SERVICES_JSON";
+    public static final String TAG = ModelFragment.class.getSimpleName();
 
     private final Set<String> calledPhones = new HashSet<>();
     private final Set<String> deletedPhoneNumbers = new HashSet<>();
@@ -51,13 +56,23 @@ public class ModelFragment extends android.support.v4.app.Fragment {
     private boolean isLoaded;
     private NetworkClient networkClient;
     private Context applicationContext;
+    private Gson gson;
+    private Handler handler;
+    private Call<ServicesListResponse> listCall;
+    private final Runnable loadFromDiskAction = () -> {
+        if (tryLoadFromDisk() && listCall != null) {
+            listCall.cancel();
+        }
+    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         applicationContext = getContext().getApplicationContext();
+        handler = new Handler();
         contentUrl = getString(R.string.content_url);
         preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        gson = new Gson();
 
         phonesMap.put(CALLED_NUMS, calledPhones);
         phonesMap.put(DELETED_NUMS, deletedPhoneNumbers);
@@ -217,30 +232,63 @@ public class ModelFragment extends android.support.v4.app.Fragment {
 
     private void loadContent() {
         notifyDataSetLoading();
+
+        if (!isOnline() && tryLoadFromDisk()) {
+            return;
+        }
+
+        handler.postDelayed(loadFromDiskAction, 1500); // 1.5 seconds timeout
+
         if (networkClient == null) {
             networkClient = new NetworkClient(this, contentUrl);
         }
-        Call<ServicesListResponse> listCall = networkClient.getApi().getServices();
+        listCall = networkClient.getApi().getServices();
         listCall.enqueue(new Callback<ServicesListResponse>() {
             @Override
             public void onResponse(Response<ServicesListResponse> response) {
+                listCall = null;
                 serviceToPhonesMap.clear();
-                for (Service service : response.body().getServiceList()) {
+                List<Service> services = response.body().getServiceList();
+
+                String servicesJson = gson.toJson(services.toArray());
+                preferences.edit().putString(SERVICES_JSON, servicesJson).apply();
+
+                for (Service service : services) {
                     serviceToPhonesMap.put(service.getName(), service.getNumbers());
                 }
-                isLoaded = true;
-                notifyDataSetChanged();
+
+                if (!serviceToPhonesMap.isEmpty()) {
+                    isLoaded = true;
+                    notifyDataSetChanged();
+                    handler.removeCallbacks(loadFromDiskAction);
+                    Log.d(TAG, "loaded from network");
+                }
             }
 
             @Override
             public void onFailure(Throwable t) {
                 Log.e(ModelFragment.class.getSimpleName(), "Failed to load the content.", t);
                 FragmentActivity activity = getActivity();
-                if (activity != null) {
+                if (activity != null && !tryLoadFromDisk()) {
                     showProblemSnack(activity.findViewById(android.R.id.content));
                 }
             }
         });
+    }
+
+    private boolean tryLoadFromDisk() {
+        String servicesJson = preferences.getString(SERVICES_JSON, "");
+        if (!servicesJson.isEmpty()) {
+            Service[] services = gson.fromJson(servicesJson, Service[].class);
+            for (Service service : services) {
+                serviceToPhonesMap.put(service.getName(), service.getNumbers());
+            }
+            isLoaded = true;
+            notifyDataSetChanged();
+            Log.d(TAG, "loaded from disk");
+            return true;
+        }
+        return false;
     }
 
     private void showProblemSnack(View rootview) {
