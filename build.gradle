@@ -29,11 +29,11 @@ subprojects{
     apply plugin: project.name.equals("dubnataxi") ? 'com.android.application' : 'com.android.library'
 
     android {
-        compileSdkVersion 23
-        buildToolsVersion '23.0.2'
+        compileSdkVersion 25
+        buildToolsVersion '23.0.3'
         defaultConfig {
             minSdkVersion 9
-            targetSdkVersion 23
+            targetSdkVersion 25
         }
     }
 }
