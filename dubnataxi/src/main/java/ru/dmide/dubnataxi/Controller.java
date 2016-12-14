@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -39,9 +40,11 @@ public class Controller {
     private volatile boolean phonesAnimationInProgress;
     private final ModelFragment model;
     private final Map<String, PhonesAdapter> activePhonesAdapters = new HashMap<>();
+    private final Handler handler;
 
     public Controller(ModelFragment model) {
         this.model = model;
+        handler = new Handler();
     }
 
     public void onServiceClick(View serviceView, String serviceId) {
@@ -181,7 +184,9 @@ public class Controller {
 
         phonesList.setOnItemClickListener((parent, view, position, id) -> {
             onPhoneNumberClick(phonesAdapter.getItem(position));
-            phonesAdapter.notifyDataSetChanged();
+            handler.postDelayed(() -> {
+                phonesAdapter.notifyDataSetChanged();
+            }, 500); // let the ripple animation finish before changing item bg to SELECTED
         });
     }
 
