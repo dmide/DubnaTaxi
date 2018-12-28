@@ -8,7 +8,7 @@ import android.text.method.LinkMovementMethod;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.dmide.dubnataxi.R;
 
@@ -16,13 +16,13 @@ public class InfoActivity extends BaseActivity {
     public static final int REQUEST_CODE = 1337;
     public static final int RESULT_CODE_RATED = 1;
 
-    @Bind(R.id.mail_to)
+    @BindView(R.id.mail_to)
     TextView mailTo;
-    @Bind(R.id.sources)
+    @BindView(R.id.sources)
     TextView sources;
-    @Bind(R.id.rate_btn)
+    @BindView(R.id.rate_btn)
     TextView rateBtn;
-    @Bind(R.id.donate_btn)
+    @BindView(R.id.donate_btn)
     TextView donateBtn;
 
     @Override
