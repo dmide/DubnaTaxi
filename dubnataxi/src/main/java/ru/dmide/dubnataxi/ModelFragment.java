@@ -245,7 +245,7 @@ public class ModelFragment extends android.support.v4.app.Fragment {
         listCall = networkClient.getApi().getServices();
         listCall.enqueue(new Callback<ServicesListResponse>() {
             @Override
-            public void onResponse(Response<ServicesListResponse> response) {
+            public void onResponse(Call<ServicesListResponse> call, Response<ServicesListResponse> response) {
                 listCall = null;
                 serviceToPhonesMap.clear();
                 List<Service> services = response.body().getServiceList();
@@ -266,7 +266,7 @@ public class ModelFragment extends android.support.v4.app.Fragment {
             }
 
             @Override
-            public void onFailure(Throwable t) {
+            public void onFailure(Call<ServicesListResponse> call, Throwable t) {
                 Log.e(ModelFragment.class.getSimpleName(), "Failed to load the content.", t);
                 FragmentActivity activity = getActivity();
                 if (activity != null && !tryLoadFromDisk()) {

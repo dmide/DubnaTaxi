@@ -15,7 +15,7 @@ import android.widget.Toast;
 import com.nhaarman.listviewanimations.appearance.AnimationAdapter;
 import com.nhaarman.listviewanimations.appearance.simple.ScaleInAnimationAdapter;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.dmide.dubnataxi.Controller;
 import ru.dmide.dubnataxi.ModelFragment;
@@ -29,9 +29,9 @@ public class MainActivity extends BaseActivity implements ModelFragment.DataList
     private ModelFragment model;
     private Controller controller;
 
-    @Bind(R.id.services_list)
+    @BindView(R.id.services_list)
     ListView servicesListView;
-    @Bind(R.id.swipe_container)
+    @BindView(R.id.swipe_container)
     SwipeRefreshLayout swipeRefreshLayout;
 
     private ServicesAdapter servicesAdapter;

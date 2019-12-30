@@ -1,25 +1,29 @@
-task wrapper(type: Wrapper) {
-    gradleVersion = '1.11'
-}
-
 buildscript {
     repositories {
-        mavenCentral()
+        maven {
+            url 'https://maven.google.com/'
+        }
+        jcenter()
     }
     dependencies {
         classpath "com.android.tools.build:gradle:$androidPluginVersion"
-        classpath 'me.tatarka:gradle-retrolambda:3.2.4'
     }
 }
 
 subprojects{
     repositories {
-        mavenCentral()
+        maven {
+            url 'https://maven.google.com/'
+        }
+        jcenter()
     }
 
     buildscript {
         repositories {
-            mavenCentral()
+            maven {
+                url 'https://maven.google.com/'
+            }
+            jcenter()
         }
         dependencies {
             classpath "com.android.tools.build:gradle:$androidPluginVersion"
@@ -29,11 +33,11 @@ subprojects{
     apply plugin: project.name.equals("dubnataxi") ? 'com.android.application' : 'com.android.library'
 
     android {
-        compileSdkVersion 25
-        buildToolsVersion '23.0.3'
+        compileSdkVersion 26
+        buildToolsVersion '26.0.2'
         defaultConfig {
             minSdkVersion 9
-            targetSdkVersion 25
+            targetSdkVersion 26
         }
     }
 }
