@@ -7,11 +7,10 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
 
 import org.json.JSONArray;
@@ -24,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -34,7 +35,7 @@ import ru.dmide.dubnataxi.web.ServicesListResponse;
 /**
  * Created by drevis on 19.02.14.
  */
-public class ModelFragment extends android.support.v4.app.Fragment {
+public class ModelFragment extends Fragment {
     private static final String TO_RATE_OR_NOT_TO_RATE = "TO_RATE_OR_NOT_TO_RATE";
     private static final String CALLED_NUMS = "CALLED_NUMS";
     private static final String DELETED_NUMS = "DELETED_NUMS";
@@ -245,7 +246,7 @@ public class ModelFragment extends android.support.v4.app.Fragment {
         listCall = networkClient.getApi().getServices();
         listCall.enqueue(new Callback<ServicesListResponse>() {
             @Override
-            public void onResponse(Call<ServicesListResponse> call, Response<ServicesListResponse> response) {
+            public void onResponse(Response<ServicesListResponse> response) {
                 listCall = null;
                 serviceToPhonesMap.clear();
                 List<Service> services = response.body().getServiceList();
@@ -266,7 +267,7 @@ public class ModelFragment extends android.support.v4.app.Fragment {
             }
 
             @Override
-            public void onFailure(Call<ServicesListResponse> call, Throwable t) {
+            public void onFailure(Throwable t) {
                 Log.e(ModelFragment.class.getSimpleName(), "Failed to load the content.", t);
                 FragmentActivity activity = getActivity();
                 if (activity != null && !tryLoadFromDisk()) {

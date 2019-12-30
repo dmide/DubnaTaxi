@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">DubnaTaxi</string>
-    <string name="content_url">https://dubnataxi.000webhostapp.com/</string>
+    <string name="content_url">http://dmide.github.io/</string>
     <string name="action_clear">Восстановить список</string>
     <string name="action_where">Где я?</string>
     <string name="face">\u0CA0__\u0CA0</string>
@@ -24,8 +24,6 @@
     <string name="google_play_link">https://play.google.com/store/apps/details?id=ru.dmide.dubnataxi</string>
     <string name="mail_to"><![CDATA[Электронная почта: <a href="mailto:revdmide@gmail.com">revdmide@gmail.com</a>]]></string>
     <string name="sources"><![CDATA[Исходный код: <a href="https://github.com/dmide/DubnaTaxi">github.com</a>]]></string>
-
-    <string name="title_activity_donate">Поддержать</string>
 
     <string-array name="donation_google_catalog_values">
         <item>Buy me a beer!</item>

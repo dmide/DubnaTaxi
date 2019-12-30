@@ -39,12 +39,6 @@
                 android:text="@string/rate_app"
                 android:layout_gravity="center_vertical"/>
 
-            <Button
-                style="@style/info_btn"
-                android:id="@+id/donate_btn"
-                android:text="@string/donate"
-                android:layout_gravity="center_vertical"/>
-
         </LinearLayout>
 
     </RelativeLayout>

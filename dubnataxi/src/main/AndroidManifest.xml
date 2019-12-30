@@ -29,10 +29,6 @@
             android:name=".activity.InfoActivity"
             android:label="@string/title_activity_info" >
         </activity>
-        <activity
-            android:name=".activity.DonateActivity"
-            android:label="@string/title_activity_donate" >
-        </activity>
     </application>
 
 </manifest>

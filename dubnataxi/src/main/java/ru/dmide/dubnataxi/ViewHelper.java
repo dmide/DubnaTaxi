@@ -3,16 +3,17 @@ package ru.dmide.dubnataxi;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.widget.TextView;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.animation.ValueAnimator;
+
+import androidx.annotation.NonNull;
 
 /**
  * Created by dmide on 10/03/2016.
@@ -43,11 +44,7 @@ public class ViewHelper {
     }
 
     public static Snackbar makeStyledSnack(@NonNull View view, @NonNull CharSequence text, int duration) {
-        Snackbar snack = Snackbar.make(view, text, duration);
-        TextView tv = (TextView) snack.getView().findViewById(android.support.design.R.id.snackbar_text);
-        tv.setTextColor(Color.WHITE);
-        tv.setGravity(Gravity.CENTER_HORIZONTAL);
-        return snack;
+        return Snackbar.make(view, text, duration);
     }
 
     public static void applyVisibility(View[] views, int vis) {

@@ -7,14 +7,11 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.view.ViewCompat;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ListView;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.SwipeDismissAdapter;
 import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.animation.ValueAnimator;
@@ -22,6 +19,9 @@ import com.nineoldandroids.animation.ValueAnimator;
 import java.util.HashMap;
 import java.util.Map;
 
+import androidx.core.app.ActivityCompat;
+import androidx.core.view.ViewCompat;
+import androidx.fragment.app.FragmentActivity;
 import ru.dmide.dubnataxi.activity.InfoActivity;
 import ru.dmide.dubnataxi.adapters.PhonesAdapter;
 import ru.dmide.dubnataxi.adapters.ServicesAdapter;

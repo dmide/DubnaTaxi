@@ -1,7 +1,6 @@
 package ru.dmide.dubnataxi.adapters;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +15,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import androidx.annotation.NonNull;
 import ru.dmide.dubnataxi.ModelFragment;
 import ru.dmide.dubnataxi.R;
 

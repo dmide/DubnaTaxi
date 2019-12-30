@@ -1,6 +1,5 @@
 package ru.dmide.dubnataxi.adapters;
 
-import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +8,7 @@ import android.widget.TextView;
 
 import com.nhaarman.listviewanimations.ArrayAdapter;
 
+import androidx.annotation.NonNull;
 import ru.dmide.dubnataxi.ModelFragment;
 import ru.dmide.dubnataxi.R;
 import ru.dmide.dubnataxi.ViewHelper;

@@ -1,52 +1,9 @@
 buildscript {
     repositories {
+        jcenter()
         maven {
             url 'https://maven.google.com/'
-        }
-        jcenter()
-    }
-    dependencies {
-        classpath "com.android.tools.build:gradle:$androidPluginVersion"
-    }
-}
-
-subprojects{
-    repositories {
-        maven {
-            url 'https://maven.google.com/'
-        }
-        jcenter()
-    }
-
-    buildscript {
-        repositories {
-            maven {
-                url 'https://maven.google.com/'
-            }
-            jcenter()
-        }
-        dependencies {
-            classpath "com.android.tools.build:gradle:$androidPluginVersion"
-        }
-    }
-
-    apply plugin: project.name.equals("dubnataxi") ? 'com.android.application' : 'com.android.library'
-
-    android {
-        compileSdkVersion 26
-        buildToolsVersion '26.0.2'
-        defaultConfig {
-            minSdkVersion 9
-            targetSdkVersion 26
-        }
-    }
-}
-
-allprojects {
-    configurations.all {
-        resolutionStrategy {
-            force "com.android.support:support-v4:$support_version"
-            force "com.android.support:appcompat-v7:$support_version"
+            name 'Google'
         }
     }
 }

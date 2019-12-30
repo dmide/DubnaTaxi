@@ -22,8 +22,6 @@ public class InfoActivity extends BaseActivity {
     TextView sources;
     @BindView(R.id.rate_btn)
     TextView rateBtn;
-    @BindView(R.id.donate_btn)
-    TextView donateBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,12 +41,6 @@ public class InfoActivity extends BaseActivity {
             Uri uri = Uri.parse(getString(R.string.google_play_link));
             Intent intent = new Intent(Intent.ACTION_VIEW, uri);
             startActivity(intent);
-        });
-
-        donateBtn.setOnClickListener(v -> {
-            setResult(RESULT_CODE_RATED);
-            Intent i = new Intent(InfoActivity.this, DonateActivity.class);
-            startActivity(i);
         });
     }
 

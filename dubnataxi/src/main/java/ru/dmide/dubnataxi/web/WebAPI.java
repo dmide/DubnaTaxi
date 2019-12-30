@@ -4,6 +4,6 @@ import retrofit2.Call;
 import retrofit2.http.GET;
 
 public interface WebAPI {
-  @GET("/")
+  @GET("DubnaTaxi/data.json")
   Call<ServicesListResponse> getServices();
 }
